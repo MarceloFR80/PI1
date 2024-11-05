@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastrar Cotação</title>
+</head>
+<body>
+    <h1>Cadastrar Cotação</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ serializer.as_p }}
+        <button type="submit">Enviar</button>
+    </form>
+</body>
+</html>

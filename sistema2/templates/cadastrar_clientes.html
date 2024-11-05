@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Cadastrar Novo Cliente{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 900px;">
+    <h2 class="text-center mb-4 p-3 bg-primary text-white rounded">Cadastrar Novo Cliente</h2>
+    <form id="cadastrar-cliente-form" method="POST" action="{% url 'cadastrar_clientes' %}" class="bg-light p-4 rounded shadow-sm">
+        {% csrf_token %}
+
+        <!-- Informações do Cliente -->
+        <h4 class="text-muted">Informações Pessoais</h4>
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                {{ form.nome_razaosocial.label_tag }}
+                {{ form.nome_razaosocial|add_class:"form-control" }}
+            </div>
+            <div class="form-group col-md-4">
+                {{ form.tipo.label_tag }}
+                {{ form.tipo|add_class:"form-control" }}
+            </div>
+            <div class="form-group col-md-4">
+                {{ form.cpf_cnpj.label_tag }}
+                {{ form.cpf_cnpj|add_class:"form-control" }}
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                {{ form.email.label_tag }}
+                {{ form.email|add_class:"form-control" }}
+            </div>
+            <div class="form-group col-md-4">
+                {{ form.telefone_1.label_tag }}
+                {{ form.telefone_1|add_class:"form-control" }}
+            </div>
+            <div class="form-group col-md-4">
+                {{ form.telefone_2.label_tag }}
+                {{ form.telefone_2|add_class:"form-control" }}
+            </div>
+        </div>
+
+        <!-- Informações de Endereço -->
+        <h4 class="text-muted mt-4">Endereço</h4>
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                {{ form.rua.label_tag }}
+                {{ form.rua|add_class:"form-control" }}
+            </div>
+            <div class="form-group col-md-4">
+                {{ form.numero.label_tag }}
+                {{ form.numero|add_class:"form-control" }}
+            </div>
+            <div class="form-group col-md-4">
+                {{ form.bairro.label_tag }}
+                {{ form.bairro|add_class:"form-control" }}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                {{ form.cidade.label_tag }}
+                {{ form.cidade|add_class:"form-control" }}
+            </div>            
+            <div class="form-group col-md-4">
+                {{ form.cep.label_tag }}
+                {{ form.cep|add_class:"form-control" }}
+            </div>
+            <div class="form-group col-md-4">
+                {{ form.uf.label_tag }}
+                {{ form.uf|add_class:"form-control" }}
+            </div>
+        </div>
+
+        <!-- Botão de Envio -->
+        <button type="submit" class="btn btn-primary btn-block mt-4">Cadastrar</button>
+    </form>
+</div>
+{% endblock %}

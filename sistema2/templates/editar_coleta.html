@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 d-flex justify-content-center">
+    <div class="col-md-8">
+        <h2 class="text-center text-white p-3 bg-primary rounded">Editar Coleta</h2>
+        <div class="card shadow p-5">
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="cep_origem" class="font-weight-bold">CEP de Origem:</label>
+                        <input type="text" class="form-control" id="cep_origem" name="cep_origem" value="{{ coleta.cep_origem }}" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="cep_destino" class="font-weight-bold">CEP de Destino:</label>
+                        <input type="text" class="form-control" id="cep_destino" name="cep_destino" value="{{ coleta.cep_destino }}" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="peso" class="font-weight-bold">Peso (kg):</label>
+                        <input type="number" class="form-control" id="peso" name="peso" value="{{ coleta.peso }}" step="0.01" required>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="dimensoes" class="font-weight-bold">Dimensões (LxAxP):</label>
+                        <input type="text" class="form-control" id="dimensoes" name="dimensoes" value="{{ coleta.dimensoes }}" required>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="valor_carga" class="font-weight-bold">Valor da Carga (R$):</label>
+                        <input type="number" class="form-control" id="valor_carga" name="valor_carga" value="{{ coleta.valor_carga }}" step="0.01" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="data_coleta" class="font-weight-bold">Data da Coleta:</label>
+                        <input type="date" class="form-control" id="data_coleta" name="data_coleta" value="{{ coleta.data_coleta }}" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="descricao_produto" class="font-weight-bold">Descrição do Produto:</label>
+                        <textarea class="form-control" id="descricao_produto" name="descricao_produto" rows="3" required>{{ coleta.descricao_produto }}</textarea>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-success btn-lg px-4">Salvar Alterações</button>
+                    <a href="{% url 'listar_coletas' %}" class="btn btn-secondary btn-lg px-4 ml-2">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

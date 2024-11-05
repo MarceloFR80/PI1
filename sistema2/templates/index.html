@@ -1,0 +1,79 @@
+<!-- templates/index.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}ADtrans   -   FAST CARGO{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Bem-vindo ao Sistema   ADtrans   -   FAST CARGO</h2>
+    
+    
+    <div class="row justify-content-center">
+        <!-- Card Clientes -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-lg h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Clientes</h5>
+                    <p class="card-text">Gerencie os clientes cadastrados.</p>
+                    <a href="{% url 'listar_clientes' %}" class="btn btn-primary">Acessar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Motoristas -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-lg h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Motoristas</h5>
+                    <p class="card-text">Gerencie os motoristas cadastrados.</p>
+                    <a href="{% url 'motoristas' %}" class="btn btn-primary">Acessar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Ordens de Coleta -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-lg h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Ordens de Coleta</h5>
+                    <p class="card-text">Gerencie as ordens de coleta.</p>
+                    <a href="{% url 'listar_coletas' %}" class="btn btn-primary">Acessar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Controle de Coletas e Entregas -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-lg h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Controle de Coletas e Entregas</h5>
+                    <p class="card-text">Acompanhe as Coletas e Entregas.</p>
+                    <a href="{% url 'controle_coletas' %}" class="btn btn-primary">Acessar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Financeiro -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-lg h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Financeiro</h5>
+                    <p class="card-text">Gerencie o controle financeiro.</p>
+                    <a href="{% url 'financeiro' %}" class="btn btn-primary">Acessar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Sobre -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-lg h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Sobre</h5>
+                    <p class="card-text">Saiba mais.</p>
+                    <a href="{% url 'sobre' %}" class="btn btn-primary">Acessar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

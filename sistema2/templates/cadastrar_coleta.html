@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 600px;">
+    <h2 class="text-center mb-4 p-3 bg-primary text-white rounded">Cadastrar Coleta</h2>
+    
+    <form method="post" class="form shadow p-4 rounded bg-light">
+        {% csrf_token %}
+        
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                {{ form.cep_origem.label_tag }}
+                {{ form.cep_origem|add_class:"form-control" }}
+            </div>
+            <div class="form-group col-md-6">
+                {{ form.cep_destino.label_tag }}
+                {{ form.cep_destino|add_class:"form-control" }}
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                {{ form.peso.label_tag }}
+                {{ form.peso|add_class:"form-control" }}
+            </div>
+            <div class="form-group col-md-6">
+                {{ form.dimensoes.label_tag }}
+                {{ form.dimensoes|add_class:"form-control" }}
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                {{ form.valor_carga.label_tag }}
+                {{ form.valor_carga|add_class:"form-control" }}
+            </div>
+            <div class="form-group col-md-6">
+                {{ form.valor_frete.label_tag }}
+                {{ form.valor_frete|add_class:"form-control" }}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                {{ form.data_coleta.label_tag }}
+                {{ form.data_coleta|add_class:"form-control" }}
+            </div>
+            
+            <div class="form-group col-md-6">
+                {{ form.descricao_produto.label_tag }}
+                {{ form.descricao_produto|add_class:"form-control" }}
+            </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-block mt-3">Cadastrar Coleta</button>
+    </form>
+</div>
+{% endblock %}

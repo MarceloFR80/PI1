@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh; margin-top: 50px;">
+    <div class="card shadow" style="width: 100%; max-width: 400px; border-radius: 12px; overflow: hidden;">
+        <!-- Barra de Título com Degradê -->
+        <div style="background: linear-gradient(90deg, #0066cc, #00ccff); padding: 15px;">
+            <h3 class="text-center text-white mb-0">Bem-vindo de Volta!</h3>
+        </div>
+
+        <!-- Corpo do Formulário -->
+        <div class="card-body p-4">
+            <p class="text-center text-muted mb-4">Faça login para continuar</p>
+            <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    <label for="username" class="text-muted">Usuário</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white border-right-0">
+                                <i class="fas fa-user"></i>
+                            </span>
+                        </div>
+                        <input type="text" name="username" class="form-control border-left-0" id="username" required>
+                    </div>
+                </div>
+                <div class="form-group mb-4">
+                    <label for="password" class="text-muted">Senha</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white border-right-0">
+                                <i class="fas fa-lock"></i>
+                            </span>
+                        </div>
+                        <input type="password" name="password" class="form-control border-left-0" id="password" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block" style="border-radius: 25px;">Entrar</button>
+            </form>
+            <div class="text-center mt-3">
+                <small class="text-muted">Não tem uma conta? <a href="{% url 'register' %}" class="text-primary">Cadastre-se</a></small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
