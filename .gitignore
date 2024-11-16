@@ -32,12 +32,3 @@ Thumbs.db
 # Arquivos estáticos e de mídia gerados
 /staticfiles/
 /media/
-# Chave APi Google maps ---AIzaSyC4qrmqXd3zG-Uj75fwpabt-qipWlBj1Uk
-# {
-    "client_secret":"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",
-    "grant_type":"refresh_token",
-    "refresh_token":"",
-    "client_id":"280350993167-8ma3l0b54ahpjmqjq752jmr2qp0hrlli.apps.googleusercontent.com"
-
-
-  }
