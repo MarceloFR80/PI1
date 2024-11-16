@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container mt-5 w-50">
+    <h2 class="text-center">Confirmar Exclusão</h2>
+    <p class="text-center mt-4">Tem certeza de que deseja excluir a transação <strong>{{ object.descricao }}</strong>?</p>
+    <div class="text-center mt-4">
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Excluir</button>
+            <a href="{% url 'financeiro_list' %}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

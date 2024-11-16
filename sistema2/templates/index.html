@@ -1,11 +1,11 @@
 <!-- templates/index.html -->
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}ADtrans   -   FAST CARGO{% endblock %}
+{% block title %}ADtrans   -   NS CARGO{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Bem-vindo ao Sistema   ADtrans   -   FAST CARGO</h2>
+    <h2 class="text-center mb-4">Bem-vindo ao Sistema   ADtrans   -   NS CARGO</h2>
     
     
     <div class="row justify-content-center">
@@ -26,7 +26,7 @@
                 <div class="card-body text-center">
                     <h5 class="card-title">Motoristas</h5>
                     <p class="card-text">Gerencie os motoristas cadastrados.</p>
-                    <a href="{% url 'motoristas' %}" class="btn btn-primary">Acessar</a>
+                    <a href="{% url 'motorista_create' %}" class="btn btn-primary">Acessar</a>
                 </div>
             </div>
         </div>
@@ -59,7 +59,7 @@
                 <div class="card-body text-center">
                     <h5 class="card-title">Financeiro</h5>
                     <p class="card-text">Gerencie o controle financeiro.</p>
-                    <a href="{% url 'financeiro' %}" class="btn btn-primary">Acessar</a>
+                    <a href="{% url 'financeiro_list' %}" class="btn btn-primary">Acessar</a>
                 </div>
             </div>
         </div>

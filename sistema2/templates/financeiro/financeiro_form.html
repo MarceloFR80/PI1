@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 600px;">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-center mb-4 p-3 bg-primary text-white rounded">Cadastrar Financeiro</h2>
+        
+        <form method="post" class="form bg-light p-4 rounded">
+            {% csrf_token %}
+            
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    {{ form.descricao.label_tag }}
+                    {{ form.descricao|add_class:"form-control" }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ form.valor.label_tag }}
+                    {{ form.valor|add_class:"form-control" }}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    {{ form.data_operacao.label_tag }}
+                    {{ form.data_operacao|add_class:"form-control" }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ form.operacao.label_tag }}
+                    {{ form.operacao|add_class:"form-control" }}
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-block">Cadastrar Financeiro</button>
+                <a href="{% url 'financeiro_list' %}" class="btn btn-secondary btn-block mt-2">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

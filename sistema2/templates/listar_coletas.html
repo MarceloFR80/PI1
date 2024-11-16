@@ -1,52 +1,61 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-
-<div class="container mt-5 d-flex justify-content-center">
-    <div class="col-md-10"> <!-- Altera a largura para 80% -->
-        <h2 class="text-center mb-4">Lista de Coletas</h2>
-        <div class="table-responsive">
-            <table class="table table-striped mt-4 text-center">
-                <thead class="table-dark">
-                    <tr>
-                        <th>CLIENTE CPF/CNPJ</th>
-                        <th>CEP Origem</th>                       
-                        <th>CEP Destino</th>                                           
-                        <th>Peso (kg)</th>
-                        <th>Dimensões (LxAxP)</th>
-                        <th>Valor da Carga (R$)</th>
-                        <th>Data de Coleta</th>
-                        <th>Data de Criação</th>
-                        <th>Descrição do Produto</th>
-                        <th>Valor do Frete (R$)</th>
-                        <th>Editar</th>
-                        <th>Excluir</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for coleta in coletas %}
-                    <tr>
-                        <td>{{ coleta.cpf_cnpj_cliente }}</td>
-                        <td>{{ coleta.cep_origem }}</td>
-                        <td>{{ coleta.cep_destino }}</td>
-                        <td>{{ coleta.peso }}</td>
-                        <td>{{ coleta.dimensoes }}</td>
-                        <td>{{ coleta.valor_carga }}</td>
-                        <td>{{ coleta.data_coleta }}</td>
-                        <td>{{ coleta.data_criacao }}</td>
-                        <td>{{ coleta.descricao_produto }}</td>
-                        <td>{{ coleta.valor_frete }}</td>
-                        <td>
-                            <a href="{% url 'editar_coleta' coleta.id %}" class="btn btn-sm btn-warning">Editar</a>
-                        </td>
-                        <td>
-                            <a href="{% url 'excluir_coleta' coleta.id %}" class="btn btn-sm btn-danger">Excluir</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<div class="container  text-center mt-4"> <!-- Alterei de mt-5 para mt-3 para reduzir a margem superior -->
+    <div class="d-flex justify-content-center">
+        <div class="col-md-11"> <!-- Ajuste de largura para ocupar 90% da tela -->
+            <h2 class="text-center mb-4"></h2>
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="display-5">Lista de Coletas</h1>
+                <a class="btn btn-primary btn-lg" href="{% url 'cadastrar_coleta' %}">
+                    <i class="fas fa-plus"></i> Nova Coleta</a>
+            </div>  
+            <div class="table-responsive">
+                
+                <table class="table table-bordered table-hover table-striped text-center">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>CLIENTE CPF/CNPJ</th>
+                            <th>CEP Origem</th>
+                            <th>CEP Destino</th>
+                            <th>Peso (kg)</th>
+                            <th>Dimensões (m³)</th>
+                            <th>Valor da Carga (R$)</th>
+                            <th>Data de Coleta</th>
+                            <th>Data de Criação</th>
+                            <th>Tipo de Frete</th>
+                            <th>Descrição do Produto</th>
+                            <th>Valor do Frete (R$)</th>
+                            <th>Editar</th>
+                            <th>Excluir</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for coleta in coletas %}
+                        <tr>
+                            <td>{{ coleta.cpf_cnpj_cliente }}</td>
+                            <td>{{ coleta.cep_origem }}</td>
+                            <td>{{ coleta.cep_destino }}</td>
+                            <td>{{ coleta.peso }}</td>
+                            <td>{{ coleta.dimensoes }}</td>
+                            <td>{{ coleta.valor_carga }}</td>
+                            <td>{{ coleta.data_coleta }}</td>
+                            <td>{{ coleta.data_criacao }}</td>
+                            <td>{{ coleta.tipo_frete }}</td>
+                            <td>{{ coleta.descricao_produto }}</td>
+                            <td>{{ coleta.valor_frete }}</td>
+                            <td>
+                                <a href="{% url 'editar_coleta' coleta.id %}" class="btn btn-sm btn-warning">Editar</a>
+                            </td>
+                            <td>
+                                <a href="{% url 'excluir_coleta' coleta.id %}" class="btn btn-sm btn-danger">Excluir</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

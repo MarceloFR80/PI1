@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.db.models import Sum
 
 class Cliente(models.Model):
     TIPO_CHOICES = (
@@ -32,32 +33,79 @@ class Cliente(models.Model):
     numero = models.CharField(max_length=10, default="S/N")
 
     def __str__(self):
-        return self.nome_razaosocial
-
+        return f"{self.cpf_cnpj}"
+    #{self.nome_razaosocial} - 
 
 class Cotacao(models.Model):
+    TIPOFRETE_CHOICES = (
+        ('NO', 'Frete Normal'),
+        ('EX', 'Frete Expresso'),
+    )
+
+    cpf_cnpj_cliente = models.CharField(max_length=20, default="000.000.000-00")  # Campo para armazenar CPF/CNPJ
     cep_origem = models.CharField(max_length=9)
     cep_destino = models.CharField(max_length=9)
     peso = models.DecimalField(max_digits=8, decimal_places=2)
     dimensoes = models.CharField(max_length=20)
     valor_carga = models.DecimalField(max_digits=10, decimal_places=2)
     data_coleta = models.DateField()
+    tipo_frete = models.CharField(max_length=20, choices=TIPOFRETE_CHOICES, default="NO")
     descricao_produto = models.TextField()
-    valor_frete = models.DecimalField(max_digits=10, decimal_places=2)
+    valor_frete = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     data_criacao = models.DateTimeField(auto_now_add=True)
-    
-    # Relacionamento indireto via CPF/CNPJ
-    cpf_cnpj_cliente = models.CharField(max_length=20)  # Adiciona este campo
-
-    def __str__(self):
-        return f"Cotação de {self.cep_origem} para {self.cep_destino}"
 
     def clean(self):
         # Verifica se existe um cliente com o CPF/CNPJ fornecido
         if not Cliente.objects.filter(cpf_cnpj=self.cpf_cnpj_cliente).exists():
-            raise ValidationError(f"Cliente com CPF/CNPJ {self.cpf_cnpj_cliente} não encontrado.")
+            raise ValidationError(f"Cliente com CPF/CNPJ {self.cpf_cnpj_cliente} não encontrado. Verifique se ele está cadastrado.")
+
+    def __str__(self):
+        return f"Cotação de {self.cep_origem} para {self.cep_destino}"
+
+#-----------------------------------------------------------------MOTORISTAS-------------------------------------------------------
+class Motorista(models.Model):
+    TIPO_CHOICES = (
+        ('PR', 'Motorista Próprio'),
+        ('AG', 'Motorista Agregado'),
+    )
+    nome = models.CharField(max_length=255)
+    tipo = models.CharField(max_length=2, choices=TIPO_CHOICES)
+    cpf_cnpj = models.CharField(max_length=18, unique=True)
+    celular = models.CharField(max_length=15, default='')          # Novo campo celular
+    telefone = models.CharField(max_length=15)
+    tipo_de_veiculo = models.CharField(max_length=50, default='')
+    placa = models.CharField(max_length=8, default='')
+    email = models.EmailField()
+    
+    
+    def __str__(self):
+        return self.nome
+#-----------------------------------------------------------------FINANCEIRO-----------------------------------------------------------
+class Financeiro(models.Model):
+    OPERACAO_CHOICES = [
+        ('CR', 'Crédito'),
+        ('DB', 'Débito'),
+    ]
+
+    descricao = models.CharField(max_length=255)
+    valor = models.DecimalField(max_digits=10, decimal_places=2)
+    data_operacao = models.DateField()
+    operacao = models.CharField(max_length=2, choices=OPERACAO_CHOICES)
+
+    def __str__(self):
+        return self.descricao
 
     @property
-    def cliente(self):
-        # Obtém o cliente associado ao CPF/CNPJ, se existir
-        return Cliente.objects.filter(cpf_cnpj=self.cpf_cnpj_cliente).first()
+    def receitas(self):
+        # Calcula a receita total de todas as operações de crédito
+        return Financeiro.objects.filter(operacao='CR').aggregate(total=Sum('valor'))['total'] or 0
+
+    @property
+    def despesas(self):
+        # Calcula a despesa total de todas as operações de débito
+        return Financeiro.objects.filter(operacao='DB').aggregate(total=Sum('valor'))['total'] or 0
+
+    @property
+    def lucro_prejuiso(self):
+        # Calcula o lucro/prejuízo com base na receita e despesa totais
+        return self.receitas - self.despesas

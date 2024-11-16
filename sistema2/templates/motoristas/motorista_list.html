@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container  text-center mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5">Lista de Motoristas</h1>
+        <a class="btn btn-primary btn-lg" href="{% url 'motorista_create' %}">
+            <i class="fas fa-plus"></i> Novo Motorista</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover table-bordered text-center align-middle" style="border-radius: 8px; overflow: hidden;">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>CPF/CNPJ</th>
+                    <th>Telefone</th>
+                    <th>Email</th>
+                    <th>Tipo de Veículo</th>
+                    <th>Placa</th>
+                    <th>Celular</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for motorista in object_list %}
+                    <tr>
+                        <td>{{ motorista.nome }}</td>
+                        <td>{{ motorista.get_tipo_display }}</td>
+                        <td>{{ motorista.cpf_cnpj }}</td>
+                        <td>{{ motorista.telefone }}</td>
+                        <td>{{ motorista.email }}</td>
+                        <td>{{ motorista.tipo_de_veiculo }}</td>
+                        <td>{{ motorista.placa }}</td>
+                        <td>{{ motorista.celular }}</td>
+                        <td class="text-center">
+                            <a class="btn btn-warning btn-sm mr-1" href="{% url 'motorista_update' motorista.pk %}" title="Editar">
+                                <i class="fas fa-pencil-alt"></i>
+                            </a>
+                            <a class="btn btn-danger btn-sm" href="{% url 'motorista_delete' motorista.pk %}" title="Excluir">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9">Nenhum motorista cadastrado.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

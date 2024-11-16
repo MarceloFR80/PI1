@@ -1,5 +1,5 @@
 from django import forms
-from .models import Cliente, Cotacao
+from .models import Cliente, Cotacao, Motorista, Financeiro
 
 class ClienteForm(forms.ModelForm):
     class Meta:
@@ -23,26 +23,77 @@ class ClienteForm(forms.ModelForm):
             'numero': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número'}),
         }
 
+#---------------------------------------------------------------------------------------------------------------------------
+
 class ColetaForm(forms.ModelForm):
-    cpf_cnpj_cliente = forms.CharField(
-        required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'CPF/CNPJ do Cliente'})
+    cpf_cnpj_cliente = forms.ModelChoiceField(
+        queryset=Cliente.objects.all(),
+        to_field_name="cpf_cnpj",
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        label="Cliente (CPF/CNPJ)"
     )
 
     class Meta:
-        model = Cotacao  # ou Coleta
+        model = Cotacao
         fields = [
-            'cep_origem', 'cep_destino', 'peso', 'dimensoes', 
-            'valor_carga', 'data_coleta', 'descricao_produto', 
-            'valor_frete', 'cpf_cnpj_cliente'  # Inclui o campo cpf_cnpj_cliente
+            'cpf_cnpj_cliente', 'cep_origem', 'cep_destino', 'peso', 'dimensoes',
+            'valor_carga', 'data_coleta', 'tipo_frete', 'descricao_produto'
         ]
         widgets = {
             'cep_origem': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'CEP de Origem'}),
             'cep_destino': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'CEP de Destino'}),
             'peso': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Peso'}),
-            'dimensoes': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Dimensões'}),
+            'dimensoes': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Dimensões (m³)'}),
             'valor_carga': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Valor da Carga'}),
             'data_coleta': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'tipo_frete': forms.Select(attrs={'class': 'form-control'}),
             'descricao_produto': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Descrição do Produto'}),
-            'valor_frete': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Valor do Frete'}),
         }
+
+#-------------------------------------------------------------------------------------------------------------------------------------------
+class MotoristaForm(forms.ModelForm):
+    class Meta:
+        model = Motorista
+        fields = [
+            'nome', 
+            'tipo', 
+            'cpf_cnpj', 
+            'celular', 
+            'telefone', 
+            'tipo_de_veiculo', 
+            'placa', 
+            'email'
+        ]
+        
+        widgets = {
+            'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome do Motorista'}),
+            'tipo': forms.Select(attrs={'class': 'form-control'}),
+            'cpf_cnpj': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'CPF/CNPJ'}),
+            'celular': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Celular'}),
+            'telefone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telefone'}),
+            'tipo_de_veiculo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tipo de Veículo'}),
+            'placa': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Placa'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
+        }
+        
+        labels = {
+            'nome': 'Nome',
+            'tipo': 'Tipo de Motorista',
+            'cpf_cnpj': 'CPF/CNPJ',
+            'celular': 'Celular',
+            'telefone': 'Telefone',
+            'tipo_de_veiculo': 'Tipo de Veículo',
+            'placa': 'Placa do Veículo',
+            'email': 'Email',
+        }
+
+#------------------------------------------------FINANCEIRO----------------------------------------------
+class FinanceiroForm(forms.ModelForm):
+    class Meta:
+        model = Financeiro
+        fields = ['descricao', 'valor', 'data_operacao', 'operacao']
+        
+    data_operacao = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        label="Data de Operação"
+    )

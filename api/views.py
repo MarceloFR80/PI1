@@ -14,7 +14,15 @@ from .models import Cotacao  # Supondo que este seja o nome do modelo de cotaç�
 from rest_framework.views import APIView
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
-
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from .models import Motorista
+from django.db.models import Sum  # Importar Sum
+from .models import Financeiro
+from .forms import FinanceiroForm
+from django.utils import timezone  # Import para usar datas
+from django.shortcuts import get_object_or_404
+import requests
 #-----------------------------------LOGIN--------------------------------------------------------
 def register(request):
     if request.method == 'POST':
@@ -107,16 +115,27 @@ def cadastrar_cotacao(request):
         #return Response(serializer.data, status=status.HTTP_200_OK)
 
 #---------------------------------------------------------/////---------------------------------------------
-def motoristas_view(request):
-    return render(request, 'motoristas.html')  # Certifique-se de que existe um template motoristas.html
+class MotoristaListView(ListView):
+    model = Motorista
+    template_name = 'motoristas/motorista_list.html'
 
-def cadastrar_motorista(request):
-    # Lógica para cadastrar motorista
-    return render(request, 'cadastrar_motorista.html')
+class MotoristaCreateView(CreateView):
+    model = Motorista
+    fields = ['nome', 'tipo', 'cpf_cnpj', 'telefone', 'email', 'tipo_de_veiculo', 'placa', 'celular']
+    template_name = 'motoristas/motorista_create.html'
+    success_url = reverse_lazy('motorista_list')
 
-def listar_motoristas(request):
-    # Lógica para listar motoristas
-    return render(request, 'listar_motoristas.html')
+class MotoristaUpdateView(UpdateView):
+    model = Motorista
+    fields = ['nome', 'tipo', 'cpf_cnpj', 'telefone', 'email', 'tipo_de_veiculo', 'placa', 'celular']
+    template_name = 'motoristas/motorista_create.html'
+    success_url = reverse_lazy('motorista_list')
+
+class MotoristaDeleteView(DeleteView):
+    model = Motorista
+    template_name = 'motoristas/motorista_confirm_delete.html'
+    success_url = reverse_lazy('motorista_list')
+
 #-----------------------------------------------------------------------------------------------------------
 def ordens_coleta_view(request):
     return render(request, 'ordens_coleta.html')  # Crie o template ordens_coleta.html se ainda não existir
@@ -150,10 +169,24 @@ def excluir_cliente(request, id):
         return redirect('listar_clientes')
     return render(request, 'confirmar_exclusao.html', {'cliente': cliente})
 #------------------------------------------------LISTAR COTACÕES---------------------------------------------
+
+
 def listar_coletas(request):
+    TIPO_FRETE_MAP = {
+        'EX': 'Expresso',
+        'NO': 'Normal'
+    }
+
     coletas = Cotacao.objects.all()
+
+    # Traduz os valores de tipo_frete antes de enviar ao template
+    for coleta in coletas:
+        coleta.tipo_frete = TIPO_FRETE_MAP.get(coleta.tipo_frete, coleta.tipo_frete)
+
     return render(request, 'listar_coletas.html', {'coletas': coletas})
 
+
+#-------------------------------------------------------------------------------------------------------------
 def editar_coleta(request, id):
     coleta = get_object_or_404(Cotacao, id=id)
     # Adicione aqui o código para editar a coleta
@@ -166,13 +199,119 @@ def excluir_coleta(request, id):
         return redirect('listar_coletas')
     return render(request, 'excluir_coleta.html', {'coleta': coleta})
 
+# Função auxiliar para calcular o valor do frete
+def obter_distancia_real(cep_origem, cep_destino):
+    api_key = "AIzaSyC4qrmqXd3zG-Uj75fwpabt-qipWlBj1Uk"  # Substitua pela sua chave de API
+    url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={cep_origem}&destinations={cep_destino}&region=br&key={api_key}"
+
+    print(f"URL da API: {url}")  # Log da URL gerada
+    try:
+        response = requests.get(url)
+        print(f"Status da resposta: {response.status_code}")  # Log do status da resposta
+        data = response.json()
+        print(f"Dados retornados: {data}")  # Log dos dados retornados
+
+        # Verifica se a resposta foi bem-sucedida
+        if data["status"] == "OK":
+            distancia_metros = data["rows"][0]["elements"][0]["distance"]["value"]  # Em metros
+            distancia_km = distancia_metros / 1000  # Converte para km
+            print(f"Distância calculada: {distancia_km} km")  # Log da distância calculada
+            return distancia_km
+        else:
+            error_message = data.get("error_message", "Resposta inválida")
+            print(f"Erro na API: {error_message}")
+            return None
+    except Exception as e:
+        print(f"Erro ao obter distância real: {e}")
+        return None
+
+
+def calcular_valor_frete(cep_origem, cep_destino, peso, dimensoes, valor_carga, tipo_frete):
+    # Fatores de cálculo do frete (substitua conforme suas necessidades)
+    taxa_base = 5.00  # Taxa base
+    taxa_distancia = 0.05  # Taxa por quilômetro
+    taxa_peso = 0.10  # Taxa por quilo
+    taxa_dimensoes = 0.02  # Taxa por dimensão (exemplo)
+    taxa_seguro = 0.01 if tipo_frete == 'EX' else 0.005  # Taxa de seguro para frete expresso ou normal
+
+    # Obtenha a distância real entre os dois CEPs
+    distancia_real = obter_distancia_real(cep_origem, cep_destino)
+    if distancia_real is None:
+        print("Erro: Distância real não pôde ser calculada. Usando distância padrão.")
+        distancia_real = 0  # Ou uma distância padrão como fallback
+
+    # Cálculos baseados na distância real
+    custo_distancia = distancia_real * taxa_distancia
+    custo_peso = float(peso) * taxa_peso
+    custo_dimensoes = float(dimensoes) * taxa_dimensoes
+    custo_seguro = float(valor_carga) * taxa_seguro
+
+    # Cálculo final
+    valor_frete = taxa_base + custo_distancia + custo_peso + custo_dimensoes + custo_seguro
+    return round(valor_frete, 2)  # Arredonda o valor final
+
+
+# View para cadastrar coleta e salvar valor do frete
 def cadastrar_coleta(request):
     if request.method == 'POST':
         form = ColetaForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('listar_coletas')  # Redireciona para a lista de coletas após o cadastro
+            coleta = form.save(commit=False)
+
+            # Extrair os dados do formulário
+            coleta.cpf_cnpj_cliente = form.cleaned_data['cpf_cnpj_cliente'].cpf_cnpj  # Armazena o CPF/CNPJ do cliente selecionado
+            cep_origem = form.cleaned_data['cep_origem']
+            cep_destino = form.cleaned_data['cep_destino']
+            peso = form.cleaned_data['peso']
+            dimensoes = form.cleaned_data['dimensoes']
+            valor_carga = form.cleaned_data['valor_carga']
+            tipo_frete = form.cleaned_data['tipo_frete']
+
+            # Calcular o valor do frete
+            valor_frete = calcular_valor_frete(cep_origem, cep_destino, peso, dimensoes, valor_carga, tipo_frete)
+            coleta.valor_frete = valor_frete
+
+            # Salvar a coleta com o CPF/CNPJ do cliente associado
+            coleta.save()
+            messages.success(request, f"Coleta cadastrada com sucesso! Valor do frete: R$ {valor_frete}")
+            return redirect('listar_coletas')
+        else:
+            messages.error(request, 'Erro ao cadastrar a coleta. Verifique os dados e tente novamente.')
     else:
         form = ColetaForm()
     
     return render(request, 'cadastrar_coleta.html', {'form': form})
+
+#---------------------------------------------------------------FINANCEIRO--------------------------------------------------
+class FinanceiroListView(ListView):
+    model = Financeiro
+    template_name = 'financeiro/financeiro_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        total_receitas = Financeiro.objects.filter(operacao='CR').aggregate(total=Sum('valor'))['total'] or 0
+        total_despesas = Financeiro.objects.filter(operacao='DB').aggregate(total=Sum('valor'))['total'] or 0
+        total_lucro_prejuiso = total_receitas - total_despesas
+        
+        context['total_receitas'] = total_receitas
+        context['total_despesas'] = total_despesas
+        context['total_lucro_prejuiso'] = total_lucro_prejuiso
+        return context
+
+class FinanceiroCreateView(CreateView):
+    model = Financeiro
+    form_class = FinanceiroForm
+    template_name = 'financeiro/financeiro_form.html'
+    success_url = reverse_lazy('financeiro_list')
+
+class FinanceiroUpdateView(UpdateView):
+    model = Financeiro
+    fields = ['descricao', 'valor', 'data_operacao', 'operacao']
+    template_name = 'financeiro/financeiro_form.html'
+    success_url = reverse_lazy('financeiro_list')
+
+class FinanceiroDeleteView(DeleteView):
+    model = Financeiro
+    template_name = 'financeiro/financeiro_confirm_delete.html'
+    success_url = reverse_lazy('financeiro_list')
+#------------------------------------------------------------------------------------------------------------------------------------------

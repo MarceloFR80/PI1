@@ -17,5 +17,5 @@ class CotacaoSerializer(serializers.ModelSerializer):
         model = Cotacao
         fields = [
             'cep_origem', 'cep_destino', 'peso', 'dimensoes',
-            'valor_carga', 'data_coleta', 'descricao_produto', 'valor_frete','cpf_cnpj_cliente'
+            'valor_carga', 'data_coleta', 'tipo_frete', 'descricao_produto', 'valor_frete','cpf_cnpj_cliente'
         ]

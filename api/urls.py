@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
 from .views import ClienteCreateAPIView, CotacaoCreateAPIView, cadastrar_cotacao, CadastrarCotacaoView,  ClienteListAPIView, ClienteDetailAPIView
+from .views import MotoristaListView, MotoristaCreateView, MotoristaUpdateView, MotoristaDeleteView
 
 urlpatterns = [
 
@@ -21,9 +22,11 @@ urlpatterns = [
     path('clientes/novo/', views.cadastrar_clientes, name='cadastrar_clientes'),  # Exibe o template de cadastro
     #path('clientes/<int:pk>/', ClienteDetailAPIView.as_view(), name='cliente_detail'),  # Rota para editar/deletar
     #path('clientes/cadastrar/', views.cadastrar_clientes, name='cadastrar_clientes'),
-    path('motoristas/', views.motoristas_view, name='motoristas'),  # Certifique-se de que a view motoristas_view existe
-    path('cadastrar_motorista/', views.cadastrar_motorista, name='cadastrar_motorista'),
-    path('listar_motoristas/', views.listar_motoristas, name='listar_motoristas'),
+
+    path('motoristas/', MotoristaListView.as_view(), name='motorista_list'),  # URL para listar motoristas
+    path('motoristas/add/', MotoristaCreateView.as_view(), name='motorista_create'),  # URL para criação de motorista
+    path('motoristas/<int:pk>/edit/', MotoristaUpdateView.as_view(), name='motorista_update'),
+    path('motoristas/<int:pk>/delete/', MotoristaDeleteView.as_view(), name='motorista_delete'),
 
     path('cotacao/cadastrar/', views.cadastrar_cotacao, name='cadastrar_cotacao'),
     path('cotacao/', views.ListarCotacoesView.as_view(), name='listar_cotacao'),  # Para visualizar todas as cotações
@@ -37,6 +40,12 @@ urlpatterns = [
 
     path('ordens-coleta/', views.ordens_coleta_view, name='ordens_coleta'),  # Certifique-se de que a view ordens_coleta_view existe
     path('controle-coletas/', views.controle_coletas_view, name='controle_coletas'),
-    path('financeiro/', views.financeiro_view, name='financeiro'),  # Defina a URL e a view para "financeiro"
+   
     path('sobre/', views.sobre_view, name='sobre'),  # Adicione esta linha para a página "Sobre"
+
+    # path('financeiro/', views.financeiro_view, name='financeiro'),  # Defina a URL e a view para "financeiro"
+    path('financeiro/', views.FinanceiroListView.as_view(), name='financeiro_list'),
+    path('financeiro/new/', views.FinanceiroCreateView.as_view(), name='financeiro_create'),
+    path('financeiro/<int:pk>/edit/', views.FinanceiroUpdateView.as_view(), name='financeiro_update'),
+    path('financeiro/<int:pk>/delete/', views.FinanceiroDeleteView.as_view(), name='financeiro_delete'),
 ]
