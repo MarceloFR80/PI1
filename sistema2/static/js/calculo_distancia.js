@@ -1,6 +1,6 @@
 // Função para buscar coordenadas de um CEP usando a Geocoding API
 async function buscarCoordenadasGoogle(cep) {
-    const apiKey = 'AIzaSyC4qrmqXd3zG-Uj75fwpabt-qipWlBj1Uk'; // Substitua pela sua chave de API
+    const apiKey = ''; // Substitua pela sua chave de API
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${cep}&region=br&key=${apiKey}`;
 
     try {
@@ -21,7 +21,7 @@ async function buscarCoordenadasGoogle(cep) {
 
 // Função para calcular a distância entre dois CEPs usando a Distance Matrix API
 async function calcularDistancia(cepOrigem, cepDestino) {
-    const apiKey = 'AIzaSyC4qrmqXd3zG-Uj75fwpabt-qipWlBj1Uk'; // Substitua pela sua chave API
+    const apiKey = ''; // Substitua pela sua chave API
     const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${cepOrigem}&destinations=${cepDestino}&region=br&key=${apiKey}`;
     
     try {

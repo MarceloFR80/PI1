@@ -201,7 +201,7 @@ def excluir_coleta(request, id):
 
 # Função auxiliar para calcular o valor do frete
 def obter_distancia_real(cep_origem, cep_destino):
-    api_key = "AIzaSyC4qrmqXd3zG-Uj75fwpabt-qipWlBj1Uk"  # Substitua pela sua chave de API
+    api_key = ""  # Substitua pela sua chave de API
     url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={cep_origem}&destinations={cep_destino}&region=br&key={api_key}"
 
     print(f"URL da API: {url}")  # Log da URL gerada
