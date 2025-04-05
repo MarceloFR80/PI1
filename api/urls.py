@@ -54,6 +54,8 @@ urlpatterns = [
     path('financeiro/<int:pk>/delete/', views.FinanceiroDeleteView.as_view(), name='financeiro_delete'),
 
     path('endereco/<str:cep>/', consultar_endereco, name='consultar_endereco'),
+    path('coletas/endereco/<int:coleta_id>/', views.buscar_enderecos_da_coleta, name='buscar_enderecos_da_coleta'),
     
+    path('coletas/<int:coleta_id>/resumo_pdf/', views.gerar_pdf_coleta, name='resumo_pdf_coleta'),
 
 ]

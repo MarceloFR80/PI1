@@ -42,9 +42,21 @@ class Cotacao(models.Model):
         ('EX', 'Frete Expresso'),
     )
 
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='cotações')  # Campo para armazenar CPF/CNPJ
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='cotações')
     cep_origem = models.CharField(max_length=9)
+    rua_origem = models.CharField(max_length=100, blank=True, null=True)
+    numero_origem = models.CharField(max_length=10, blank=True, null=True)
+    bairro_origem = models.CharField(max_length=100, blank=True, null=True)
+    cidade_origem = models.CharField(max_length=100, blank=True, null=True)
+    uf_origem = models.CharField(max_length=2, blank=True, null=True)
+
     cep_destino = models.CharField(max_length=9)
+    rua_destino = models.CharField(max_length=100, blank=True, null=True)
+    numero_destino = models.CharField(max_length=10, blank=True, null=True)
+    bairro_destino = models.CharField(max_length=100, blank=True, null=True)
+    cidade_destino = models.CharField(max_length=100, blank=True, null=True)
+    uf_destino = models.CharField(max_length=2, blank=True, null=True)
+
     peso = models.DecimalField(max_digits=8, decimal_places=2)
     dimensoes = models.CharField(max_length=20)
     valor_carga = models.DecimalField(max_digits=10, decimal_places=2)
@@ -55,12 +67,12 @@ class Cotacao(models.Model):
     data_criacao = models.DateTimeField(auto_now_add=True)
 
     def clean(self):
-     if not self.cliente:
-        raise ValidationError("Cliente não selecionado.")
-
+        if not self.cliente:
+            raise ValidationError("Cliente não selecionado.")
 
     def __str__(self):
         return f"Cotação de {self.cep_origem} para {self.cep_destino}"
+
 
 #-----------------------------------------------------------------MOTORISTAS-------------------------------------------------------
 class Motorista(models.Model):

@@ -33,19 +33,36 @@ class ColetaForm(forms.ModelForm):
     class Meta:
         model = Cotacao
         fields = [
-            'cliente', 'cep_origem', 'cep_destino', 'peso', 'dimensoes',
-            'valor_carga', 'data_coleta', 'tipo_frete', 'descricao_produto'
+            'cliente',
+            
+            'cep_origem', 'rua_origem', 'numero_origem', 'bairro_origem', 'cidade_origem', 'uf_origem',
+
+            'cep_destino', 'rua_destino', 'numero_destino', 'bairro_destino', 'cidade_destino', 'uf_destino',
+
+            'peso', 'dimensoes', 'valor_carga', 'data_coleta', 'tipo_frete', 'descricao_produto'
         ]
         widgets = {
             'cliente': forms.Select(attrs={'class': 'form-control'}),
-            'cep_origem': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'CEP de Origem'}),
-            'cep_destino': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'CEP de Destino'}),
-            'peso': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Peso'}),
-            'dimensoes': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Dimensões (m³)'}),
-            'valor_carga': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Valor da Carga'}),
+            'cep_origem': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'CEP de Origem', 'id': 'cepOrigem'}),
+            'rua_origem': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly', 'id': 'ruaOrigem'}),
+            'numero_origem': forms.TextInput(attrs={'class': 'form-control', 'id': 'numeroOrigem'}),
+            'bairro_origem': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly', 'id': 'bairroOrigem'}),
+            'cidade_origem': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly', 'id': 'cidadeOrigem'}),
+            'uf_origem': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly', 'id': 'ufOrigem'}),
+
+            'cep_destino': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'CEP de Destino', 'id': 'cepDestino'}),
+            'rua_destino': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly', 'id': 'ruaDestino'}),
+            'numero_destino': forms.TextInput(attrs={'class': 'form-control', 'id': 'numeroDestino'}),
+            'bairro_destino': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly', 'id': 'bairroDestino'}),
+            'cidade_destino': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly', 'id': 'cidadeDestino'}),
+            'uf_destino': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly', 'id': 'ufDestino'}),
+
+            'peso': forms.NumberInput(attrs={'class': 'form-control'}),
+            'dimensoes': forms.TextInput(attrs={'class': 'form-control'}),
+            'valor_carga': forms.NumberInput(attrs={'class': 'form-control'}),
             'data_coleta': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'tipo_frete': forms.Select(attrs={'class': 'form-control'}),
-            'descricao_produto': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Descrição do Produto'}),
+            'descricao_produto': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -54,6 +71,7 @@ class ColetaForm(forms.ModelForm):
         self.fields['cliente'].label = "Cliente (Nome/Razão Social - CPF/CNPJ)"
         self.fields['cliente'].empty_label = "Selecione um cliente"
         self.fields['cliente'].label_from_instance = lambda obj: f"{obj.nome_razaosocial} - {obj.cpf_cnpj}"
+
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
 class MotoristaForm(forms.ModelForm):

@@ -14,11 +14,11 @@
             <!-- Linha: Cliente e CEP de Origem -->
             <div class="form-row">
                 <div class="form-group col-md-6">
-                    <label for="id_cliente">Cliente</label>
-                    {{ form.cliente|add_class:"form-control" }}
+                    {{ form.cliente.label_tag }}
+                    {{ form.cliente|add_class:"form-control"|attr:"id:id_cliente" }}
                 </div>
                 <div class="form-group col-md-6">
-                    <label for="cepOrigem">CEP Origem</label>
+                    {{ form.cep_origem.label_tag }}
                     {{ form.cep_origem|add_class:"form-control"|attr:"id:cepOrigem" }}
                 </div>
             </div>
@@ -28,74 +28,65 @@
                 <h6 class="text-muted mb-3">Endereço de Origem</h6>
                 <div class="form-row">
                     <div class="form-group col-md-4">
-                        <label for="ruaOrigem">Rua</label>
-                        <input type="text" id="ruaOrigem" class="form-control bg-white" readonly>
+                        {{ form.rua_origem.label_tag }}
+                        {{ form.rua_origem|add_class:"form-control"|attr:"id:ruaOrigem" }}
                     </div>
                     <div class="form-group col-md-2">
-                        <label for="numeroOrigem">Número</label>
-                        <input type="text" id="numeroOrigem" name="numeroOrigem" class="form-control">
+                        {{ form.numero_origem.label_tag }}
+                        {{ form.numero_origem|add_class:"form-control"|attr:"id:numeroOrigem" }}
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="bairroOrigem">Bairro</label>
-                        <input type="text" id="bairroOrigem" class="form-control bg-white" readonly>
+                        {{ form.bairro_origem.label_tag }}
+                        {{ form.bairro_origem|add_class:"form-control"|attr:"id:bairroOrigem" }}
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label for="cidadeOrigem">Cidade</label>
-                        <input type="text" id="cidadeOrigem" class="form-control bg-white" readonly>
+                        {{ form.cidade_origem.label_tag }}
+                        {{ form.cidade_origem|add_class:"form-control"|attr:"id:cidadeOrigem" }}
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="ufOrigem">UF</label>
-                        <input type="text" id="ufOrigem" class="form-control bg-white" readonly>
+                        {{ form.uf_origem.label_tag }}
+                        {{ form.uf_origem|add_class:"form-control"|attr:"id:ufOrigem" }}
                     </div>
                 </div>
-            </div>
-
-            <!-- CEP de Destino -->
-            <div class="form-group">
-                <label for="cepDestino">CEP Destino</label>
-                {{ form.cep_destino|add_class:"form-control"|attr:"id:cepDestino" }}
             </div>
 
             <!-- Endereço de Destino -->
             <div class="bg-light p-3 rounded mb-4 border">
                 <h6 class="text-muted mb-3">Endereço de Destino</h6>
                 <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ form.cep_destino.label_tag }}
+                        {{ form.cep_destino|add_class:"form-control"|attr:"id:cepDestino" }}
+                    </div>
+                </div>
+                <div class="form-row">
                     <div class="form-group col-md-4">
-                        <label for="ruaDestino">Rua</label>
-                        <input type="text" id="ruaDestino" class="form-control bg-white" readonly>
+                        {{ form.rua_destino.label_tag }}
+                        {{ form.rua_destino|add_class:"form-control"|attr:"id:ruaDestino" }}
                     </div>
                     <div class="form-group col-md-2">
-                        <label for="numeroDestino">Número</label>
-                        <input type="text" id="numeroDestino" name="numeroDestino" class="form-control">
+                        {{ form.numero_destino.label_tag }}
+                        {{ form.numero_destino|add_class:"form-control"|attr:"id:numeroDestino" }}
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="bairroDestino">Bairro</label>
-                        <input type="text" id="bairroDestino" class="form-control bg-white" readonly>
+                        {{ form.bairro_destino.label_tag }}
+                        {{ form.bairro_destino|add_class:"form-control"|attr:"id:bairroDestino" }}
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label for="cidadeDestino">Cidade</label>
-                        <input type="text" id="cidadeDestino" class="form-control bg-white" readonly>
+                        {{ form.cidade_destino.label_tag }}
+                        {{ form.cidade_destino|add_class:"form-control"|attr:"id:cidadeDestino" }}
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="ufDestino">UF</label>
-                        <input type="text" id="ufDestino" class="form-control bg-white" readonly>
+                        {{ form.uf_destino.label_tag }}
+                        {{ form.uf_destino|add_class:"form-control"|attr:"id:ufDestino" }}
                     </div>
                 </div>
             </div>
 
-            <!-- Distância -->
-            <div class="form-group">
-                <label>Distância estimada:</label>
-                <p id="resultadoDistancia" class="form-control bg-light" style="white-space: pre-wrap;">
-                    Preencha ambos os CEPs para calcular.
-                </p>
-            </div>
-
-            <!-- Linha: Peso, Dimensões, Valor da Carga -->
             <div class="form-row">
                 <div class="form-group col-md-4">
                     {{ form.peso.label_tag }}
@@ -111,7 +102,6 @@
                 </div>
             </div>
 
-            <!-- Linha: Tipo Frete, Data Coleta -->
             <div class="form-row">
                 <div class="form-group col-md-6">
                     {{ form.tipo_frete.label_tag }}
@@ -123,13 +113,11 @@
                 </div>
             </div>
 
-            <!-- Descrição -->
             <div class="form-group">
                 {{ form.descricao_produto.label_tag }}
                 {{ form.descricao_produto|add_class:"form-control" }}
             </div>
 
-            <!-- Botões -->
             <div class="text-center mt-4">
                 <button type="submit" class="btn btn-primary px-5 py-2">Cadastrar Coleta</button>
                 <a href="{% url 'listar_coletas' %}" class="btn btn-outline-secondary px-5 py-2 mt-2">Cancelar</a>
@@ -137,12 +125,7 @@
         </form>
     </div>
 </div>
-
-
-
-
 <script>
-    // Preencher endereço de origem ao selecionar cliente
     document.addEventListener("DOMContentLoaded", function () {
         const clienteSelect = document.getElementById("id_cliente");
         const campoCepOrigem = document.getElementById("cepOrigem");
@@ -151,14 +134,13 @@
         const campoBairro = document.getElementById("bairroOrigem");
         const campoCidade = document.getElementById("cidadeOrigem");
         const campoUf = document.getElementById("ufOrigem");
-    
+
         if (clienteSelect) {
             clienteSelect.addEventListener("change", () => {
                 const clienteId = clienteSelect.value;
                 if (!clienteId) return;
-    
-                const BASE_URL = "/api";  // ajuste conforme sua rota real
-                fetch(`${BASE_URL}/buscar_cliente/?id=${clienteId}`)
+
+                fetch(`/api/buscar_cliente/?id=${clienteId}`)
                     .then(response => response.json())
                     .then(data => {
                         if (!data.erro) {
@@ -178,53 +160,29 @@
                     });
             });
         }
+
+        // Endereço destino via CEP
+        document.getElementById("cepDestino").addEventListener("blur", function () {
+            const cep = this.value.replace(/\D/g, '');
+            if (cep.length !== 8) return;
+
+            fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.erro) {
+                        document.getElementById("ruaDestino").value = data.logradouro || '';
+                        document.getElementById("bairroDestino").value = data.bairro || '';
+                        document.getElementById("cidadeDestino").value = data.localidade || '';
+                        document.getElementById("ufDestino").value = data.uf || '';
+                    } else {
+                        alert("CEP de destino não encontrado.");
+                    }
+                })
+                .catch(() => {
+                    alert("Erro ao buscar o CEP de destino.");
+                });
+        });
     });
-    
-    
-
-    // Preencher endereço de destino com base no CEP digitado
-    document.getElementById("cepDestino").addEventListener("blur", function () {
-        const cep = this.value.replace(/\D/g, '');
-        if (cep.length !== 8) return;
-
-        fetch(`https://viacep.com.br/ws/${cep}/json/`)
-            .then(response => response.json())
-            .then(data => {
-                if (!data.erro) {
-                    document.getElementById("ruaDestino").value = data.logradouro || '';
-                    document.getElementById("bairroDestino").value = data.bairro || '';
-                    document.getElementById("cidadeDestino").value = data.localidade || '';
-                    document.getElementById("ufDestino").value = data.uf || '';
-                } else {
-                    alert("CEP de destino não encontrado.");
-                }
-            })
-            .catch(() => {
-                alert("Erro ao buscar o CEP de destino.");
-            });
-    });
-
-    // Cálculo da distância entre os CEPs
-    const calcularDistanciaAoPerderFoco = async () => {
-        const cepOrigem = document.getElementById("cepOrigem").value.trim();
-        const cepDestino = document.getElementById("cepDestino").value.trim();
-        const resultadoDistancia = document.getElementById("resultadoDistancia");
-
-        if (cepOrigem && cepDestino) {
-            resultadoDistancia.textContent = "Calculando...";
-            try {
-                const { distancia, duracao } = await calcularDistancia(cepOrigem, cepDestino);
-                resultadoDistancia.textContent = `Distância: ${distancia}\nDuração: ${duracao}`;
-            } catch (error) {
-                resultadoDistancia.textContent = `Erro ao calcular distância: ${error.message}`;
-            }
-        } else {
-            resultadoDistancia.textContent = "Preencha ambos os CEPs para calcular.";
-        }
-    };
-
-    document.getElementById("cepOrigem").addEventListener("blur", calcularDistanciaAoPerderFoco);
-    document.getElementById("cepDestino").addEventListener("blur", calcularDistanciaAoPerderFoco);
 </script>
 
 {% endblock %}

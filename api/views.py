@@ -24,6 +24,9 @@ from django.utils import timezone  # Import para usar datas
 from django.shortcuts import get_object_or_404
 import requests
 from django.http import JsonResponse
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 #-----------------------------------LOGIN--------------------------------------------------------
 def register(request):
     if request.method == 'POST':
@@ -190,9 +193,20 @@ def listar_coletas(request):
 #-------------------------------------------------------------------------------------------------------------
 def editar_coleta(request, id):
     coleta = get_object_or_404(Cotacao, id=id)
-    # Adicione aqui o código para editar a coleta
-    return render(request, 'editar_coleta.html', {'coleta': coleta})
 
+    if request.method == 'POST':
+        form = ColetaForm(request.POST, instance=coleta)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Coleta atualizada com sucesso.")
+            return redirect('listar_coletas')
+        else:
+            messages.error(request, "Erro ao atualizar a coleta.")
+    else:
+        form = ColetaForm(instance=coleta)  # <-- Aqui está o ponto importante
+
+    return render(request, 'editar_coleta.html', {'form': form})
+#-----------------------------------------------------Excluir Coleta------------------------------------------
 def excluir_coleta(request, id):
     coleta = get_object_or_404(Cotacao, id=id)
     if request.method == 'POST':
@@ -200,7 +214,7 @@ def excluir_coleta(request, id):
         return redirect('listar_coletas')
     return render(request, 'excluir_coleta.html', {'coleta': coleta})
 
-# Função auxiliar para calcular o valor do frete
+# -----------------------------------------------------------Função auxiliar para calcular o valor do frete
 def obter_distancia_real(cep_origem, cep_destino):
     api_key = ""  # Substitua pela sua chave de API
     url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={cep_origem}&destinations={cep_destino}&region=br&key={api_key}"
@@ -259,25 +273,37 @@ def cadastrar_coleta(request):
         if form.is_valid():
             coleta = form.save(commit=False)
 
-            # Não é necessário atribuir cliente manualmente — já está vindo no form
-            # Basta garantir que o campo se chama "cliente" no formulário
+            # Atribuir cliente (ForeignKey)
+            cliente = form.cleaned_data['cliente']
+            coleta.cliente = cliente
 
-            # Extrai dados para cálculo
-            cep_origem = coleta.cep_origem
-            cep_destino = coleta.cep_destino
-            peso = coleta.peso
-            dimensoes = coleta.dimensoes
-            valor_carga = coleta.valor_carga
-            tipo_frete = coleta.tipo_frete
+            # Endereço de origem
+            coleta.cep_origem = form.cleaned_data['cep_origem']
+            coleta.rua_origem = request.POST.get('rua_origem', '')
+            coleta.numero_origem = request.POST.get('numero_origem', '')
+            coleta.bairro_origem = request.POST.get('bairro_origem', '')
+            coleta.cidade_origem = request.POST.get('cidade_origem', '')
+            coleta.uf_origem = request.POST.get('uf_origem', '')
 
-            # Calcula o valor do frete
+            # Endereço de destino
+            coleta.cep_destino = form.cleaned_data['cep_destino']
+            coleta.rua_destino = request.POST.get('rua_destino', '')
+            coleta.numero_destino = request.POST.get('numero_destino', '')
+            coleta.bairro_destino = request.POST.get('bairro_destino', '')
+            coleta.cidade_destino = request.POST.get('cidade_destino', '')
+            coleta.uf_destino = request.POST.get('uf_destino', '')
+
+            # Calcular valor do frete
             coleta.valor_frete = calcular_valor_frete(
-                cep_origem, cep_destino, peso, dimensoes, valor_carga, tipo_frete
+                coleta.cep_origem,
+                coleta.cep_destino,
+                coleta.peso,
+                coleta.dimensoes,
+                coleta.valor_carga,
+                coleta.tipo_frete
             )
 
-            # Salva a coleta com o cliente já associado
             coleta.save()
-
             messages.success(request, f"Coleta cadastrada com sucesso! Valor do frete: R$ {coleta.valor_frete}")
             return redirect('listar_coletas')
         else:
@@ -347,4 +373,40 @@ def buscar_cliente(request):
         return JsonResponse(data)
     except Cliente.DoesNotExist:
         return JsonResponse({'erro': 'Cliente não encontrado.'})
-#-----------------------------------------------------------------------------------------------------------------------------------------    
+#-----------------------------------------------------------------------------------------------------------------------------------------  
+# --------------------------------------------------BUSCA DE ENDEREÇO DE COLETA-----------------------------------------------------------
+def buscar_enderecos_da_coleta(request, coleta_id):
+    try:
+        coleta = Cotacao.objects.select_related('cliente').get(id=coleta_id)
+        data = {
+            'cep_origem': coleta.cep_origem,
+            'numero_origem': coleta.cliente.numero,
+            'rua_origem': coleta.cliente.rua,
+            'bairro_origem': coleta.cliente.bairro,
+            'cidade_origem': coleta.cliente.cidade,
+            'uf_origem': coleta.cliente.uf,
+            'cep_destino': coleta.cep_destino,
+            # Aqui você pode adicionar campos futuros de destino, se existirem.
+        }
+        return JsonResponse(data)
+    except Cotacao.DoesNotExist:
+        return JsonResponse({'erro': 'Coleta não encontrada'}, status=404)
+#------------------------------------------------------------------------------------------------------------------------------------------  
+#----------------------------------------------Gerar PDF----------------------------------------------------------------------------------
+def gerar_pdf_coleta(request, coleta_id):
+    coleta = Cotacao.objects.get(id=coleta_id)
+    template_path = 'pdf/resumo_coleta.html'
+    context = {'coleta': coleta}
+    
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="resumo_coleta.pdf"'
+
+    template = get_template(template_path)
+    html = template.render(context)
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+
+    if pisa_status.err:
+        return HttpResponse('Erro ao gerar PDF: %s' % pisa_status.err)
+    return response
+#-----------------------------------------------------------------------------------------------------------------------------------------

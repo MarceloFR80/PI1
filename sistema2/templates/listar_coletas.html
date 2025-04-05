@@ -1,57 +1,101 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<div class="container  text-center mt-4"> <!-- Alterei de mt-5 para mt-3 para reduzir a margem superior -->
+
+<div class="container text-center mt-4">
     <div class="d-flex justify-content-center">
-        <div class="col-md-11"> <!-- Ajuste de largura para ocupar 90% da tela -->
-            <h2 class="text-center mb-4"></h2>
-            
+        <div class="col-md-11">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="display-5">Lista de Coletas</h1>
                 <a class="btn btn-primary btn-lg" href="{% url 'cadastrar_coleta' %}">
-                    <i class="fas fa-plus"></i> Nova Coleta</a>
-            </div>  
+                    <i class="fas fa-plus"></i> Nova Coleta
+                </a>
+            </div>
+
             <div class="table-responsive">
-                
                 <table class="table table-bordered table-hover table-striped text-center">
                     <thead class="thead-dark">
                         <tr>
-                            <th>CLIENTE CPF/CNPJ</th>
+                            <th>Cliente</th>
                             <th>CEP Origem</th>
                             <th>CEP Destino</th>
                             <th>Peso (kg)</th>
-                            <th>Dimensões (m³)</th>
-                            <th>Valor da Carga (R$)</th>
-                            <th>Data de Coleta</th>
-                            <th>Data de Criação</th>
-                            <th>Tipo de Frete</th>
-                            <th>Descrição do Produto</th>
-                            <th>Valor do Frete (R$)</th>
-                            <th>Editar</th>
-                            <th>Excluir</th>
+                            <th>Dimensões m³</th>
+                            <th>Valor Carga R$</th>
+                            <th>Tipo Frete</th>
+                            <th>Data Coleta</th>
+                            <th>Frete R$</th>
+                            <th>Data Criação</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for coleta in coletas %}
                         <tr>
                             <td>{{ coleta.cliente }}</td>
-                            <td>{{ coleta.cep_origem }}</td>
-                            <td>{{ coleta.cep_destino }}</td>
+
+                            <td>
+                                {{ coleta.cep_origem }}<br>
+                                <button class="btn btn-sm btn-info" data-toggle="modal" data-target="#origemModal{{ coleta.id }}">Ver detalhes</button>
+                            </td>
+
+                            <td>
+                                {{ coleta.cep_destino }}<br>
+                                <button class="btn btn-sm btn-info" data-toggle="modal" data-target="#destinoModal{{ coleta.id }}">Ver detalhes</button>
+                            </td>
+
                             <td>{{ coleta.peso }}</td>
                             <td>{{ coleta.dimensoes }}</td>
                             <td>{{ coleta.valor_carga }}</td>
+                            <td>{{ coleta.get_tipo_frete_display }}</td>
                             <td>{{ coleta.data_coleta }}</td>
-                            <td>{{ coleta.data_criacao }}</td>
-                            <td>{{ coleta.tipo_frete }}</td>
-                            <td>{{ coleta.descricao_produto }}</td>
                             <td>{{ coleta.valor_frete }}</td>
+                            <td>{{ coleta.data_criacao }}</td>
+
                             <td>
                                 <a href="{% url 'editar_coleta' coleta.id %}" class="btn btn-sm btn-warning">Editar</a>
-                            </td>
-                            <td>
-                                <a href="{% url 'excluir_coleta' coleta.id %}" class="btn btn-sm btn-danger">Excluir</a>
+                                <a href="{% url 'excluir_coleta' coleta.id %}" class="btn btn-sm btn-danger mt-2">Excluir</a>
+                                <a href="{% url 'resumo_pdf_coleta' coleta.id %}" class="btn btn-info btn-sm">Ver PDF</a>
                             </td>
                         </tr>
+
+                        <!-- Modal Endereço Origem -->
+                        <div class="modal fade" id="origemModal{{ coleta.id }}" tabindex="-1" role="dialog">
+                          <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title">Endereço de Origem</h5>
+                                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                              </div>
+                              <div class="modal-body text-left">
+                                <p><strong>Rua:</strong> {{ coleta.rua_origem }}</p>
+                                <p><strong>Número:</strong> {{ coleta.numero_origem }}</p>
+                                <p><strong>Bairro:</strong> {{ coleta.bairro_origem }}</p>
+                                <p><strong>Cidade:</strong> {{ coleta.cidade_origem }}</p>
+                                <p><strong>UF:</strong> {{ coleta.uf_origem }}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Modal Endereço Destino -->
+                        <div class="modal fade" id="destinoModal{{ coleta.id }}" tabindex="-1" role="dialog">
+                          <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header bg-success text-white">
+                                <h5 class="modal-title">Endereço de Destino</h5>
+                                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                              </div>
+                              <div class="modal-body text-left">
+                                <p><strong>Rua:</strong> {{ coleta.rua_destino }}</p>
+                                <p><strong>Número:</strong> {{ coleta.numero_destino }}</p>
+                                <p><strong>Bairro:</strong> {{ coleta.bairro_destino }}</p>
+                                <p><strong>Cidade:</strong> {{ coleta.cidade_destino }}</p>
+                                <p><strong>UF:</strong> {{ coleta.uf_destino }}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
                         {% endfor %}
                     </tbody>
                 </table>
@@ -59,4 +103,5 @@
         </div>
     </div>
 </div>
+
 {% endblock %}

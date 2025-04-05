@@ -1,48 +1,111 @@
 {% extends 'base.html' %}
+{% load widget_tweaks %}
 
 {% block content %}
 <div class="container mt-5 d-flex justify-content-center">
-    <div class="col-md-8">
+    <div class="col-md-10">
         <h2 class="text-center text-white p-3 bg-primary rounded">Editar Coleta</h2>
         <div class="card shadow p-5">
-            <form method="POST">
+            <form method="post" class="form">
                 {% csrf_token %}
 
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label for="cep_origem" class="font-weight-bold">CEP de Origem:</label>
-                        <input type="text" class="form-control" id="cep_origem" name="cep_origem" value="{{ coleta.cep_origem }}" required>
+                        {{ form.cliente.label_tag }}
+                        {{ form.cliente|add_class:"form-control" }}
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="cep_destino" class="font-weight-bold">CEP de Destino:</label>
-                        <input type="text" class="form-control" id="cep_destino" name="cep_destino" value="{{ coleta.cep_destino }}" required>
+                        {{ form.cep_origem.label_tag }}
+                        {{ form.cep_origem|add_class:"form-control"|attr:"id:id_cep_origem" }}
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group col-md-4">
-                        <label for="peso" class="font-weight-bold">Peso (kg):</label>
-                        <input type="number" class="form-control" id="peso" name="peso" value="{{ coleta.peso }}" step="0.01" required>
+                        {{ form.rua_origem.label_tag }}
+                        {{ form.rua_origem|add_class:"form-control"|attr:"id:id_rua_origem" }}
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="dimensoes" class="font-weight-bold">Dimensões (LxAxP):</label>
-                        <input type="text" class="form-control" id="dimensoes" name="dimensoes" value="{{ coleta.dimensoes }}" required>
+                        {{ form.bairro_origem.label_tag }}
+                        {{ form.bairro_origem|add_class:"form-control"|attr:"id:id_bairro_origem" }}
                     </div>
                     <div class="form-group col-md-4">
-                        <label for="valor_carga" class="font-weight-bold">Valor da Carga (R$):</label>
-                        <input type="number" class="form-control" id="valor_carga" name="valor_carga" value="{{ coleta.valor_carga }}" step="0.01" required>
+                        {{ form.numero_origem.label_tag }}
+                        {{ form.numero_origem|add_class:"form-control"|attr:"id:id_numero_origem" }}
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label for="data_coleta" class="font-weight-bold">Data da Coleta:</label>
-                        <input type="date" class="form-control" id="data_coleta" name="data_coleta" value="{{ coleta.data_coleta }}" required>
+                        {{ form.cidade_origem.label_tag }}
+                        {{ form.cidade_origem|add_class:"form-control"|attr:"id:id_cidade_origem" }}
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="descricao_produto" class="font-weight-bold">Descrição do Produto:</label>
-                        <textarea class="form-control" id="descricao_produto" name="descricao_produto" rows="3" required>{{ coleta.descricao_produto }}</textarea>
+                        {{ form.uf_origem.label_tag }}
+                        {{ form.uf_origem|add_class:"form-control"|attr:"id:id_uf_origem" }}
                     </div>
+                </div>
+
+                <div class="form-group">
+                    {{ form.cep_destino.label_tag }}
+                    {{ form.cep_destino|add_class:"form-control"|attr:"id:id_cep_destino" }}
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        {{ form.rua_destino.label_tag }}
+                        {{ form.rua_destino|add_class:"form-control"|attr:"id:id_rua_destino" }}
+                    </div>
+                    <div class="form-group col-md-4">
+                        {{ form.bairro_destino.label_tag }}
+                        {{ form.bairro_destino|add_class:"form-control"|attr:"id:id_bairro_destino" }}
+                    </div>
+                    <div class="form-group col-md-4">
+                        {{ form.numero_destino.label_tag }}
+                        {{ form.numero_destino|add_class:"form-control"|attr:"id:id_numero_destino" }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ form.cidade_destino.label_tag }}
+                        {{ form.cidade_destino|add_class:"form-control"|attr:"id:id_cidade_destino" }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        {{ form.uf_destino.label_tag }}
+                        {{ form.uf_destino|add_class:"form-control"|attr:"id:id_uf_destino" }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        {{ form.peso.label_tag }}
+                        {{ form.peso|add_class:"form-control" }}
+                    </div>
+                    <div class="form-group col-md-4">
+                        {{ form.dimensoes.label_tag }}
+                        {{ form.dimensoes|add_class:"form-control" }}
+                    </div>
+                    <div class="form-group col-md-4">
+                        {{ form.valor_carga.label_tag }}
+                        {{ form.valor_carga|add_class:"form-control" }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ form.data_coleta.label_tag }}
+                        {{ form.data_coleta|add_class:"form-control" }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        {{ form.tipo_frete.label_tag }}
+                        {{ form.tipo_frete|add_class:"form-control" }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    {{ form.descricao_produto.label_tag }}
+                    {{ form.descricao_produto|add_class:"form-control" }}
                 </div>
 
                 <div class="text-center mt-4">
@@ -53,4 +116,42 @@
         </div>
     </div>
 </div>
+
+<script>
+    function buscarEnderecoViaCEP(campoCepId, campoRuaId, campoBairroId, campoCidadeId, campoUfId) {
+        const campoCep = document.getElementById(campoCepId);
+        const rua = document.getElementById(campoRuaId);
+        const bairro = document.getElementById(campoBairroId);
+        const cidade = document.getElementById(campoCidadeId);
+        const uf = document.getElementById(campoUfId);
+
+        if (campoCep) {
+            campoCep.addEventListener("blur", function () {
+                const cep = campoCep.value.replace(/\D/g, '');
+                if (cep.length !== 8) return;
+
+                fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.erro) {
+                            rua.value = data.logradouro || '';
+                            bairro.value = data.bairro || '';
+                            cidade.value = data.localidade || '';
+                            uf.value = data.uf || '';
+                        } else {
+                            alert("CEP não encontrado.");
+                        }
+                    })
+                    .catch(() => {
+                        alert("Erro ao buscar o CEP. Tente novamente.");
+                    });
+            });
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        buscarEnderecoViaCEP("id_cep_origem", "id_rua_origem", "id_bairro_origem", "id_cidade_origem", "id_uf_origem");
+        buscarEnderecoViaCEP("id_cep_destino", "id_rua_destino", "id_bairro_destino", "id_cidade_destino", "id_uf_destino");
+    });
+</script>
 {% endblock %}

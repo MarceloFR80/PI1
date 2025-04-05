@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Resumo da Coleta</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            font-size: 13px;
+            color: #333;
+        }
+
+        h2 {
+            text-align: center;
+            background-color: #0d6efd;
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            color: #0d6efd;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            vertical-align: top;
+        }
+
+        .col-3 {
+            width: 33%;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Resumo da Coleta</h2>
+
+<div>
+    <h3 class="section-title">📌 Dados do Cliente</h3>
+    <table>
+        <tr>
+            <td class="col-3"><strong>Nome/Razão Social</strong><br>{{ coleta.cliente.nome_razaosocial }}</td>
+            <td class="col-3"><strong>CPF/CNPJ</strong><br>{{ coleta.cliente.cpf_cnpj }}</td>
+            <td class="col-3"><strong>Email</strong><br>{{ coleta.cliente.email }}</td>
+        </tr>
+    </table>
+</div>
+
+<div>
+    <h3 class="section-title">🚚 Endereço de Origem</h3>
+    <table>
+        <tr>
+            <td class="col-3"><strong>CEP</strong><br>{{ coleta.cep_origem }}</td>
+            <td class="col-3"><strong>Rua</strong><br>{{ coleta.rua_origem }}</td>
+            <td class="col-3"><strong>Número</strong><br>{{ coleta.numero_origem }}</td>
+        </tr>
+        <tr>
+            <td class="col-3"><strong>Bairro</strong><br>{{ coleta.bairro_origem }}</td>
+            <td class="col-3"><strong>Cidade</strong><br>{{ coleta.cidade_origem }}</td>
+            <td class="col-3"><strong>UF</strong><br>{{ coleta.uf_origem }}</td>
+        </tr>
+    </table>
+</div>
+
+<div>
+    <h3 class="section-title">🎯 Endereço de Destino</h3>
+    <table>
+        <tr>
+            <td class="col-3"><strong>CEP</strong><br>{{ coleta.cep_destino }}</td>
+            <td class="col-3"><strong>Rua</strong><br>{{ coleta.rua_destino }}</td>
+            <td class="col-3"><strong>Número</strong><br>{{ coleta.numero_destino }}</td>
+        </tr>
+        <tr>
+            <td class="col-3"><strong>Bairro</strong><br>{{ coleta.bairro_destino }}</td>
+            <td class="col-3"><strong>Cidade</strong><br>{{ coleta.cidade_destino }}</td>
+            <td class="col-3"><strong>UF</strong><br>{{ coleta.uf_destino }}</td>
+        </tr>
+    </table>
+</div>
+
+<div>
+    <h3 class="section-title">📦 Detalhes da Coleta</h3>
+    <table>
+        <tr>
+            <td class="col-3"><strong>Data da Coleta</strong><br>{{ coleta.data_coleta }}</td>
+            <td class="col-3"><strong>Peso</strong><br>{{ coleta.peso }} kg</td>
+            <td class="col-3"><strong>Dimensões</strong><br>{{ coleta.dimensoes }}</td>
+        </tr>
+        <tr>
+            <td class="col-3"><strong>Valor da Carga</strong><br>R$ {{ coleta.valor_carga }}</td>
+            <td class="col-3"><strong>Valor do Frete</strong><br>R$ {{ coleta.valor_frete }}</td>
+            <td class="col-3"><strong>Tipo de Frete</strong><br>{{ coleta.get_tipo_frete_display }}</td>
+        </tr>
+        <tr>
+            <td colspan="3"><strong>Descrição do Produto</strong><br>{{ coleta.descricao_produto }}</td>
+        </tr>
+    </table>
+</div>
+
+</body>
+</html>

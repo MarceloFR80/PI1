@@ -42,26 +42,26 @@
                 <div class="form-row">
                     <div class="form-group col-md-4">
                         {{ form.cidade.label_tag }}
-                        {{ form.cidade|add_class:"form-control" }}
+                        {{ form.cidade|add_class:"form-control"|attr:"id:id_cidade" }}
                     </div>
                     <div class="form-group col-md-4">
                         {{ form.uf.label_tag }}
-                        {{ form.uf|add_class:"form-control" }}
+                        {{ form.uf|add_class:"form-control"|attr:"id:id_uf" }}
                     </div>
                     <div class="form-group col-md-4">
                         {{ form.cep.label_tag }}
-                        {{ form.cep|add_class:"form-control" }}
+                        {{ form.cep|add_class:"form-control"|attr:"id:id_cep" }}
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group col-md-4">
                         {{ form.rua.label_tag }}
-                        {{ form.rua|add_class:"form-control" }}
+                        {{ form.rua|add_class:"form-control"|attr:"id:id_rua" }}
                     </div>
                     <div class="form-group col-md-4">
                         {{ form.bairro.label_tag }}
-                        {{ form.bairro|add_class:"form-control" }}
+                        {{ form.bairro|add_class:"form-control"|attr:"id:id_bairro" }}
                     </div>
                     <div class="form-group col-md-4">
                         {{ form.numero.label_tag }}
@@ -77,4 +77,38 @@
         </div>
     </div>
 </div>
+
+<!-- SCRIPT para ViaCEP -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const campoCep = document.getElementById("id_cep");
+        const campoRua = document.getElementById("id_rua");
+        const campoBairro = document.getElementById("id_bairro");
+        const campoCidade = document.getElementById("id_cidade");
+        const campoUf = document.getElementById("id_uf");
+
+        if (campoCep) {
+            campoCep.addEventListener("blur", function () {
+                const cep = campoCep.value.replace(/\D/g, '');
+                if (cep.length !== 8) return;
+
+                fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.erro) {
+                            campoRua.value = data.logradouro || '';
+                            campoBairro.value = data.bairro || '';
+                            campoCidade.value = data.localidade || '';
+                            campoUf.value = data.uf || '';
+                        } else {
+                            alert("CEP não encontrado.");
+                        }
+                    })
+                    .catch(() => {
+                        alert("Erro ao buscar o CEP. Tente novamente.");
+                    });
+            });
+        }
+    });
+</script>
 {% endblock %}
