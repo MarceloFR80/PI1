@@ -3,6 +3,7 @@ from . import views
 from django.contrib.auth import views as auth_views
 from .views import ClienteCreateAPIView, CotacaoCreateAPIView, cadastrar_cotacao, CadastrarCotacaoView,  ClienteListAPIView, ClienteDetailAPIView
 from .views import MotoristaListView, MotoristaCreateView, MotoristaUpdateView, MotoristaDeleteView
+from .views import consultar_endereco
 
 urlpatterns = [
 
@@ -11,6 +12,9 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('register/', views.register, name='register'),
+
+    # CORRETO
+    path('buscar_cliente/', views.buscar_cliente, name='buscar_cliente'),
 
 
     #path('clientes/', ClienteListAPIView.as_view(), name='listar_clientes_api'),
@@ -48,4 +52,8 @@ urlpatterns = [
     path('financeiro/new/', views.FinanceiroCreateView.as_view(), name='financeiro_create'),
     path('financeiro/<int:pk>/edit/', views.FinanceiroUpdateView.as_view(), name='financeiro_update'),
     path('financeiro/<int:pk>/delete/', views.FinanceiroDeleteView.as_view(), name='financeiro_delete'),
+
+    path('endereco/<str:cep>/', consultar_endereco, name='consultar_endereco'),
+    
+
 ]

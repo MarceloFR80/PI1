@@ -9,7 +9,7 @@ class Cliente(models.Model):
     )
 
     ESTADOS_CHOICES = (
-        ('AC', 'Acre'), ('AL', 'Alagoas'), ('AP', 'Amapá'), ('AM', 'Amazonas'),
+        ('--', 'Selecione um estado'),('AC', 'Acre'), ('AL', 'Alagoas'), ('AP', 'Amapá'), ('AM', 'Amazonas'),
         ('BA', 'Bahia'), ('CE', 'Ceará'), ('DF', 'Distrito Federal'), ('ES', 'Espírito Santo'),
         ('GO', 'Goiás'), ('MA', 'Maranhão'), ('MT', 'Mato Grosso'), ('MS', 'Mato Grosso do Sul'),
         ('MG', 'Minas Gerais'), ('PA', 'Pará'), ('PB', 'Paraíba'), ('PR', 'Paraná'),
@@ -28,21 +28,21 @@ class Cliente(models.Model):
     cidade = models.CharField(max_length=100, default="------")
     uf = models.CharField(max_length=2, choices=ESTADOS_CHOICES, default="--")
     cep = models.CharField(max_length=10, default="00000-000")
-    rua = models.CharField(max_length=100, default="------")
+    rua = models.CharField(max_length=100, default="--")
     bairro = models.CharField(max_length=100, default="------")
     numero = models.CharField(max_length=10, default="S/N")
 
     def __str__(self):
-        return f"{self.cpf_cnpj}"
+     return f"{self.nome_razaosocial} - {self.cpf_cnpj}"
     #{self.nome_razaosocial} - 
-
+#----------------------------------------------------------------------------------------------------------------------------------------
 class Cotacao(models.Model):
     TIPOFRETE_CHOICES = (
         ('NO', 'Frete Normal'),
         ('EX', 'Frete Expresso'),
     )
 
-    cpf_cnpj_cliente = models.CharField(max_length=20, default="000.000.000-00")  # Campo para armazenar CPF/CNPJ
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='cotações')  # Campo para armazenar CPF/CNPJ
     cep_origem = models.CharField(max_length=9)
     cep_destino = models.CharField(max_length=9)
     peso = models.DecimalField(max_digits=8, decimal_places=2)
@@ -55,9 +55,9 @@ class Cotacao(models.Model):
     data_criacao = models.DateTimeField(auto_now_add=True)
 
     def clean(self):
-        # Verifica se existe um cliente com o CPF/CNPJ fornecido
-        if not Cliente.objects.filter(cpf_cnpj=self.cpf_cnpj_cliente).exists():
-            raise ValidationError(f"Cliente com CPF/CNPJ {self.cpf_cnpj_cliente} não encontrado. Verifique se ele está cadastrado.")
+     if not self.cliente:
+        raise ValidationError("Cliente não selecionado.")
+
 
     def __str__(self):
         return f"Cotação de {self.cep_origem} para {self.cep_destino}"
@@ -106,6 +106,6 @@ class Financeiro(models.Model):
         return Financeiro.objects.filter(operacao='DB').aggregate(total=Sum('valor'))['total'] or 0
 
     @property
-    def lucro_prejuiso(self):
+    def lucro_prejuizo(self):
         # Calcula o lucro/prejuízo com base na receita e despesa totais
         return self.receitas - self.despesas

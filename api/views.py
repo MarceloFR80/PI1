@@ -23,6 +23,7 @@ from .forms import FinanceiroForm
 from django.utils import timezone  # Import para usar datas
 from django.shortcuts import get_object_or_404
 import requests
+from django.http import JsonResponse
 #-----------------------------------LOGIN--------------------------------------------------------
 def register(request):
     if request.method == 'POST':
@@ -258,28 +259,32 @@ def cadastrar_coleta(request):
         if form.is_valid():
             coleta = form.save(commit=False)
 
-            # Extrair os dados do formulário
-            coleta.cpf_cnpj_cliente = form.cleaned_data['cpf_cnpj_cliente'].cpf_cnpj  # Armazena o CPF/CNPJ do cliente selecionado
-            cep_origem = form.cleaned_data['cep_origem']
-            cep_destino = form.cleaned_data['cep_destino']
-            peso = form.cleaned_data['peso']
-            dimensoes = form.cleaned_data['dimensoes']
-            valor_carga = form.cleaned_data['valor_carga']
-            tipo_frete = form.cleaned_data['tipo_frete']
+            # Não é necessário atribuir cliente manualmente — já está vindo no form
+            # Basta garantir que o campo se chama "cliente" no formulário
 
-            # Calcular o valor do frete
-            valor_frete = calcular_valor_frete(cep_origem, cep_destino, peso, dimensoes, valor_carga, tipo_frete)
-            coleta.valor_frete = valor_frete
+            # Extrai dados para cálculo
+            cep_origem = coleta.cep_origem
+            cep_destino = coleta.cep_destino
+            peso = coleta.peso
+            dimensoes = coleta.dimensoes
+            valor_carga = coleta.valor_carga
+            tipo_frete = coleta.tipo_frete
 
-            # Salvar a coleta com o CPF/CNPJ do cliente associado
+            # Calcula o valor do frete
+            coleta.valor_frete = calcular_valor_frete(
+                cep_origem, cep_destino, peso, dimensoes, valor_carga, tipo_frete
+            )
+
+            # Salva a coleta com o cliente já associado
             coleta.save()
-            messages.success(request, f"Coleta cadastrada com sucesso! Valor do frete: R$ {valor_frete}")
+
+            messages.success(request, f"Coleta cadastrada com sucesso! Valor do frete: R$ {coleta.valor_frete}")
             return redirect('listar_coletas')
         else:
             messages.error(request, 'Erro ao cadastrar a coleta. Verifique os dados e tente novamente.')
     else:
         form = ColetaForm()
-    
+
     return render(request, 'cadastrar_coleta.html', {'form': form})
 
 #---------------------------------------------------------------FINANCEIRO--------------------------------------------------
@@ -315,3 +320,31 @@ class FinanceiroDeleteView(DeleteView):
     template_name = 'financeiro/financeiro_confirm_delete.html'
     success_url = reverse_lazy('financeiro_list')
 #------------------------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------VIACEP----------------------------------------------------------------------------------
+def consultar_endereco(request, cep):
+    url = f"https://viacep.com.br/ws/{cep}/json/"
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        data = response.json()
+        return JsonResponse(data)
+    else:
+        return JsonResponse({"erro": "CEP não encontrado"}, status=404)
+#-----------------------------------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------Buscar por Clente--------------------------------------------------------------------
+def buscar_cliente(request):
+    cliente_id = request.GET.get('id')
+    try:
+        cliente = Cliente.objects.get(id=cliente_id)
+        data = {
+            'cep': cliente.cep,
+            'rua': cliente.rua,
+            'numero': cliente.numero,
+            'bairro': cliente.bairro,
+            'cidade': cliente.cidade,
+            'uf': cliente.uf,
+        }
+        return JsonResponse(data)
+    except Cliente.DoesNotExist:
+        return JsonResponse({'erro': 'Cliente não encontrado.'})
+#-----------------------------------------------------------------------------------------------------------------------------------------    
