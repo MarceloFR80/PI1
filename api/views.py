@@ -9,15 +9,15 @@ from .forms import ClienteForm, ColetaForm
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import CotacaoSerializer
-from .models import Cotacao  # Supondo que este seja o nome do modelo de cotação
+from .serializers import CotacaoSerializer  
 from rest_framework.views import APIView
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from .models import Motorista
-from django.db.models import Sum  # Importar Sum
+from .models import Motorista, Cotacao
+from django.db.models import Q
+from django.db.models import Sum  
 from .models import Financeiro
 from .forms import FinanceiroForm
 from django.utils import timezone  # Import para usar datas
@@ -122,6 +122,19 @@ def cadastrar_cotacao(request):
 class MotoristaListView(ListView):
     model = Motorista
     template_name = 'motoristas/motorista_list.html'
+    context_object_name = 'object_list'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        nome = self.request.GET.get('nome')
+        cpf_cnpj = self.request.GET.get('cpf_cnpj')
+
+        if nome:
+            queryset = queryset.filter(nome__icontains=nome)
+        if cpf_cnpj:
+            queryset = queryset.filter(cpf_cnpj__icontains=cpf_cnpj)
+
+        return queryset
 
 class MotoristaCreateView(CreateView):
     model = Motorista
@@ -142,16 +155,56 @@ class MotoristaDeleteView(DeleteView):
 
 #-----------------------------------------------------------------------------------------------------------
 def ordens_coleta_view(request):
-    return render(request, 'ordens_coleta.html')  # Crie o template ordens_coleta.html se ainda não existir
+    return render(request, 'ordens_coleta.html')  
 
 def controle_coletas_view(request):
-    return render(request, 'controle_coletas.html')  # Crie o template controle_coletas.html
+    placa = request.GET.get('placa')
+    cliente = request.GET.get('cliente')
+    status_coleta = request.GET.get('status_coleta')
+    status_entrega = request.GET.get('status_entrega')
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
 
+    coletas = Cotacao.objects.all()
+
+    if placa:
+        coletas = coletas.filter(veiculo__icontains=placa)  # Certifique-se que o campo correto seja 'veiculo'
+    if cliente:
+        coletas = coletas.filter(cliente__nome_razaosocial__icontains=cliente)
+    if data_inicio and data_fim:
+        coletas = coletas.filter(data_coleta__range=[data_inicio, data_fim])
+    if status_coleta:
+        coletas = coletas.filter(status_coleta=status_coleta)
+    if status_entrega:
+        coletas = coletas.filter(status_entrega=status_entrega)
+
+    total_coletas = coletas.count()
+    coletas_realizadas = coletas.filter(status_coleta='realizada').count()
+    coletas_pendentes = coletas.filter(status_coleta='pendente').count()
+    coletas_nao_realizadas = coletas.filter(status_coleta='nao_realizada').count()
+
+    entregas_realizadas = coletas.filter(status_entrega='realizada').count()
+    entregas_pendentes = coletas.filter(status_entrega='pendente').count()
+
+    context = {
+        'coletas': coletas,
+        'motoristas': Motorista.objects.all(),
+        'total_coletas': total_coletas,
+        'coletas_realizadas': coletas_realizadas,
+        'coletas_pendentes': coletas_pendentes,
+        'coletas_nao_realizadas': coletas_nao_realizadas,
+        'entregas_realizadas': entregas_realizadas,
+        'entregas_pendentes': entregas_pendentes,
+    }
+
+    return render(request, 'controle_coletas.html', context)
+  
+#---------------------------------------------------------------------------------------------------------------
 def financeiro_view(request):
-    return render(request, 'financeiro.html')  # Certifique-se de ter o template financeiro.html
+    return render(request, 'financeiro.html')  
 
 def sobre_view(request):
-    return render(request, 'sobre.html')  # Certifique-se de ter o template sobre.html
+    return render(request, 'sobre.html')  
 
 
 #---------------------------------------------------EDITAR_CLIENTES--------------------------------------------#
@@ -176,19 +229,20 @@ def excluir_cliente(request, id):
 
 
 def listar_coletas(request):
-    TIPO_FRETE_MAP = {
-        'EX': 'Expresso',
-        'NO': 'Normal'
-    }
+    coletas = Cotacao.objects.all()  # padrão: mostra tudo
 
-    coletas = Cotacao.objects.all()
+    filtro_por = request.GET.get('filtro_por')
+    valor = request.GET.get('valor', '').strip()
+    data_coleta = request.GET.get('data_coleta', '').strip()
 
-    # Traduz os valores de tipo_frete antes de enviar ao template
-    for coleta in coletas:
-        coleta.tipo_frete = TIPO_FRETE_MAP.get(coleta.tipo_frete, coleta.tipo_frete)
+    if filtro_por == 'cliente' and valor:
+        coletas = coletas.filter(cliente__nome_razaosocial__icontains=valor)
+    elif filtro_por == 'cidade' and valor:
+        coletas = coletas.filter(cidade_origem__icontains=valor)
+    elif filtro_por == 'data' and data_coleta:
+        coletas = coletas.filter(data_coleta=data_coleta)
 
     return render(request, 'listar_coletas.html', {'coletas': coletas})
-
 
 #-------------------------------------------------------------------------------------------------------------
 def editar_coleta(request, id):
@@ -203,7 +257,7 @@ def editar_coleta(request, id):
         else:
             messages.error(request, "Erro ao atualizar a coleta.")
     else:
-        form = ColetaForm(instance=coleta)  # <-- Aqui está o ponto importante
+        form = ColetaForm(instance=coleta)  
 
     return render(request, 'editar_coleta.html', {'form': form})
 #-----------------------------------------------------Excluir Coleta------------------------------------------

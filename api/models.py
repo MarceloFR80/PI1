@@ -42,6 +42,18 @@ class Cotacao(models.Model):
         ('EX', 'Frete Expresso'),
     )
 
+    STATUS_COLETA_CHOICES = (
+        ('PENDENTE', 'Pendente'),
+        ('REALIZADA', 'Realizada'),
+        ('NAO_REALIZADA', 'Não Realizada'),
+    )
+
+    STATUS_ENTREGA_CHOICES = (
+        ('PENDENTE', 'Pendente'),
+        ('ENTREGUE', 'Entregue'),
+        ('NAO_ENTREGUE', 'Não Entregue'),
+    )
+
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='cotações')
     cep_origem = models.CharField(max_length=9)
     rua_origem = models.CharField(max_length=100, blank=True, null=True)
@@ -66,13 +78,16 @@ class Cotacao(models.Model):
     valor_frete = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     data_criacao = models.DateTimeField(auto_now_add=True)
 
+    status_coleta = models.CharField(max_length=20, choices=STATUS_COLETA_CHOICES, default='PENDENTE')
+    status_entrega = models.CharField(max_length=20, choices=STATUS_ENTREGA_CHOICES, default='PENDENTE')
+    veiculo = models.CharField(max_length=50, blank=True, null=True)
+
     def clean(self):
         if not self.cliente:
             raise ValidationError("Cliente não selecionado.")
 
     def __str__(self):
         return f"Cotação de {self.cep_origem} para {self.cep_destino}"
-
 
 #-----------------------------------------------------------------MOTORISTAS-------------------------------------------------------
 class Motorista(models.Model):
@@ -83,7 +98,7 @@ class Motorista(models.Model):
     nome = models.CharField(max_length=255)
     tipo = models.CharField(max_length=2, choices=TIPO_CHOICES)
     cpf_cnpj = models.CharField(max_length=18, unique=True)
-    celular = models.CharField(max_length=15, default='')          # Novo campo celular
+    celular = models.CharField(max_length=15, default='')          
     telefone = models.CharField(max_length=15)
     tipo_de_veiculo = models.CharField(max_length=50, default='')
     placa = models.CharField(max_length=8, default='')

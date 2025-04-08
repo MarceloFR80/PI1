@@ -16,7 +16,7 @@ class ClienteForm(forms.ModelForm):
             'telefone_2': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telefone 2'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
 
-            # Estes precisam ter ID específico para o JS funcionar:
+            #  ID específico para o JS funcionar:
             'cep': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'CEP', 'id': 'id_cep'}),
             'rua': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Rua', 'id': 'id_rua'}),
             'bairro': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Bairro', 'id': 'id_bairro'}),

@@ -89,7 +89,7 @@
     
 
     <!-- Conteúdo principal -->
-    <main class="flex-grow-1" style="padding-top: 70px;">
+    <main class="flex-grow-1" style="padding-top: 5px;">
         {% block content %}{% endblock %}
     </main>
     
@@ -127,6 +127,40 @@
             if (campoCep) {
                 // Aciona a busca tanto ao perder o foco quanto ao pressionar TAB
                 campoCep.addEventListener("change", buscarEndereco);  // funciona com TAB
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const selectFiltro = document.getElementById("filtro_por");
+            const campoTextoDiv = document.getElementById("campoTextoDiv");
+            const campoDataDiv = document.getElementById("campoDataDiv");
+    
+            selectFiltro.addEventListener("change", function () {
+                const valor = this.value;
+    
+                if (valor === "data") {
+                    campoTextoDiv.classList.add("d-none");
+                    campoDataDiv.classList.remove("d-none");
+                } else {
+                    campoTextoDiv.classList.remove("d-none");
+                    campoDataDiv.classList.add("d-none");
+                }
+            });
+        });
+    </script>
+    <script>
+        document.getElementById("campo").addEventListener("change", function () {
+            const campoSelecionado = this.value;
+            const campoBusca = document.getElementById("campoBusca");
+            const campoDatas = document.getElementById("campoDatas");
+    
+            if (campoSelecionado === "data") {
+                campoBusca.classList.add("d-none");
+                campoDatas.classList.remove("d-none");
+            } else {
+                campoBusca.classList.remove("d-none");
+                campoDatas.classList.add("d-none");
             }
         });
     </script>

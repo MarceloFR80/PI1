@@ -1,16 +1,53 @@
 {% extends 'base.html' %}
-{% load static %}
 {% block content %}
 
-<div class="container  text-center mt-4">
+<!-- BLOCO DE FILTRO -->
+<div class="container-fluid py-2 px-4" style="background-color: #f4f6f9; border-bottom: 1px solid #ddd;">
+    <form method="get" class="row align-items-end">
+
+        <!-- Campo Nome -->
+        <div class="form-group col-md-4 mb-2">
+            <label class="mb-1">Nome</label>
+            <input type="text" name="nome" class="form-control form-control-sm"
+                   placeholder="Buscar por nome" value="{{ request.GET.nome }}">
+        </div>
+
+        <!-- Campo CPF/CNPJ -->
+        <div class="form-group col-md-4 mb-2">
+            <label class="mb-1">CPF/CNPJ</label>
+            <input type="text" name="cpf_cnpj" class="form-control form-control-sm"
+                   placeholder="Buscar por CPF ou CNPJ" value="{{ request.GET.cpf_cnpj }}">
+        </div>
+
+        <!-- Botões -->
+        <div class="form-group col-md-4 mb-2 text-right">
+            <label class="d-block mb-1">&nbsp;</label>
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-sm btn-primary mr-2 px-3">
+                    <i class="fas fa-search mr-1"></i> Buscar
+                </button>
+                <a class="btn btn-secondary btn-lg" href="{% url 'motorista_list' %}" class="btn btn-sm btn-outline-secondary px-3 border rounded">
+                    <i class="fas fa-times mr-1"></i> Limpar Filtros
+                </a>
+                
+            </div>
+        </div>
+        
+
+    </form>
+</div>
+
+<!-- LISTAGEM -->
+<div class="container text-center mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="display-5">Lista de Motoristas</h1>
         <a class="btn btn-primary btn-lg" href="{% url 'motorista_create' %}">
-            <i class="fas fa-plus"></i> Novo Motorista</a>
+            <i class="fas fa-plus"></i> Novo Motorista
+        </a>
     </div>
 
     <div class="table-responsive">
-        <table class="table table-striped table-hover table-bordered text-center align-middle" style="border-radius: 8px; overflow: hidden;">
+        <table class="table table-striped table-hover table-bordered text-center align-middle">
             <thead class="table-dark">
                 <tr>
                     <th>Nome</th>
@@ -35,7 +72,7 @@
                         <td>{{ motorista.tipo_de_veiculo }}</td>
                         <td>{{ motorista.placa }}</td>
                         <td>{{ motorista.celular }}</td>
-                        <td class="text-center">
+                        <td>
                             <a class="btn btn-warning btn-sm mr-1" href="{% url 'motorista_update' motorista.pk %}" title="Editar">
                                 <i class="fas fa-pencil-alt"></i>
                             </a>
@@ -44,9 +81,9 @@
                             </a>
                         </td>
                     </tr>
-                    {% empty %}
+                {% empty %}
                     <tr>
-                        <td colspan="9">Nenhum motorista cadastrado.</td>
+                        <td colspan="9">Nenhum motorista encontrado.</td>
                     </tr>
                 {% endfor %}
             </tbody>
