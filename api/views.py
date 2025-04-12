@@ -16,6 +16,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import Motorista, Cotacao
+from .forms import MotoristaForm
 from django.db.models import Q
 from django.db.models import Sum  
 from .models import Financeiro
@@ -138,13 +139,14 @@ class MotoristaListView(ListView):
 
 class MotoristaCreateView(CreateView):
     model = Motorista
-    fields = ['nome', 'tipo', 'cpf_cnpj', 'telefone', 'email', 'tipo_de_veiculo', 'placa', 'celular']
+    form_class = MotoristaForm  # ← Aqui está a mudança
     template_name = 'motoristas/motorista_create.html'
     success_url = reverse_lazy('motorista_list')
 
+
 class MotoristaUpdateView(UpdateView):
     model = Motorista
-    fields = ['nome', 'tipo', 'cpf_cnpj', 'telefone', 'email', 'tipo_de_veiculo', 'placa', 'celular']
+    form_class = MotoristaForm  # ← Aqui também
     template_name = 'motoristas/motorista_create.html'
     success_url = reverse_lazy('motorista_list')
 
@@ -463,4 +465,8 @@ def gerar_pdf_coleta(request, coleta_id):
     if pisa_status.err:
         return HttpResponse('Erro ao gerar PDF: %s' % pisa_status.err)
     return response
+#-----------------------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------Criar Roteirazacao-------------------------------------------------------------------------
+def criar_roteirizacao_view(request):
+    return render(request, 'roteirizacao.html')
 #-----------------------------------------------------------------------------------------------------------------------------------------

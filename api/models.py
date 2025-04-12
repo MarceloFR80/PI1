@@ -95,18 +95,28 @@ class Motorista(models.Model):
         ('PR', 'Motorista Próprio'),
         ('AG', 'Motorista Agregado'),
     )
+
+    DISPONIBILIDADE_CHOICES = (
+        ('DISPONIVEL', 'Disponível'),
+        ('INDISPONIVEL', 'Indisponível'),
+    )
+
     nome = models.CharField(max_length=255)
     tipo = models.CharField(max_length=2, choices=TIPO_CHOICES)
     cpf_cnpj = models.CharField(max_length=18, unique=True)
-    celular = models.CharField(max_length=15, default='')          
+    celular = models.CharField(max_length=15, default='')
     telefone = models.CharField(max_length=15)
     tipo_de_veiculo = models.CharField(max_length=50, default='')
     placa = models.CharField(max_length=8, default='')
     email = models.EmailField()
-    
-    
+
+    disponibilidade = models.CharField(max_length=15, choices=DISPONIBILIDADE_CHOICES, default='DISPONIVEL')
+    ultima_roteirizacao = models.DateField(null=True, blank=True)
+    cidade_base = models.CharField(max_length=100, default='', blank=True)
+
     def __str__(self):
-        return self.nome
+        return f"{self.nome} ({self.placa})"
+
 #-----------------------------------------------------------------FINANCEIRO-----------------------------------------------------------
 class Financeiro(models.Model):
     OPERACAO_CHOICES = [

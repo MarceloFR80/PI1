@@ -85,7 +85,9 @@ class MotoristaForm(forms.ModelForm):
             'telefone', 
             'tipo_de_veiculo', 
             'placa', 
-            'email'
+            'email',
+            'cidade_base',
+            'disponibilidade',
         ]
         
         widgets = {
@@ -97,6 +99,8 @@ class MotoristaForm(forms.ModelForm):
             'tipo_de_veiculo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tipo de Veículo'}),
             'placa': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Placa'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
+            'cidade_base': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Cidade Base'}),
+            'disponibilidade': forms.Select(attrs={'class': 'form-control'}),
         }
         
         labels = {
@@ -108,8 +112,9 @@ class MotoristaForm(forms.ModelForm):
             'tipo_de_veiculo': 'Tipo de Veículo',
             'placa': 'Placa do Veículo',
             'email': 'Email',
-        }
-
+            'cidade_base': 'Cidade Base',
+            'disponibilidade': 'Disponibilidade',
+    }
 #------------------------------------------------FINANCEIRO----------------------------------------------
 class FinanceiroForm(forms.ModelForm):
     class Meta:

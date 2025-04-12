@@ -57,5 +57,6 @@ urlpatterns = [
     path('coletas/endereco/<int:coleta_id>/', views.buscar_enderecos_da_coleta, name='buscar_enderecos_da_coleta'),
     
     path('coletas/<int:coleta_id>/resumo_pdf/', views.gerar_pdf_coleta, name='resumo_pdf_coleta'),
+    path('roteirizacao/criar/', views.criar_roteirizacao_view, name='criar_roteirizacao'),
 
 ]

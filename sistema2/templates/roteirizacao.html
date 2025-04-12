@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load status_filters %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h2 class="mb-4 text-primary">
+        <i class="fas fa-route"></i> Roteirização de Coletas e Entregas
+    </h2>
+
+    <form method="get" class="row g-3 align-items-end mb-4 bg-light p-3 rounded shadow-sm">
+        <div class="col-md-4">
+            <label for="motorista" class="form-label">Motorista (Nome ou Placa)</label>
+            <input type="text" name="motorista" id="motorista" class="form-control" placeholder="Digite nome ou placa">
+        </div>
+        <div class="col-md-4">
+            <label for="disponibilidade" class="form-label">Disponibilidade</label>
+            <select name="disponibilidade" id="disponibilidade" class="form-select">
+                <option value="">Todos</option>
+                <option value="DISPONIVEL">Disponível</option>
+                <option value="INDISPONIVEL">Indisponível</option>
+            </select>
+        </div>
+        <div class="col-md-4 text-end">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-search"></i> Buscar Roteiros
+            </button>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Motorista</th>
+                    <th>Tipo</th>
+                    <th>Veículo</th>
+                    <th>Placa</th>
+                    <th>Disponibilidade</th>
+                    <th>Última Roteirização</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for motorista in motoristas %}
+                <tr>
+                    <td>{{ motorista.nome }}</td>
+                    <td>{{ motorista.get_tipo_display }}</td>
+                    <td>{{ motorista.tipo_de_veiculo }}</td>
+                    <td>{{ motorista.placa }}</td>
+                    <td>
+                        <span class="badge bg-{{ motorista.disponibilidade|status_color }}">
+                            {{ motorista.get_disponibilidade_display }}
+                        </span>
+                    </td>
+                    <td>{{ motorista.ultima_roteirizacao|date:"d/m/Y" }}</td>
+                    <td>
+                        <a href="#" class="btn btn-success btn-sm">
+                            <i class="fas fa-map-marked-alt"></i> Iniciar Roteirização
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">Nenhum motorista disponível para roteirização.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
