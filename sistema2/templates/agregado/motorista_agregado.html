@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Cadastro de Motorista Agregado</h4>
+        </div>
+        <div class="card-body">
+
+            <style>
+                .nav-tabs .nav-link {
+                    font-weight: 500;
+                    color: #000 !important;
+                    border: none;
+                    border-radius: 0;
+                    transition: all 0.3s ease;
+                }
+
+                .nav-tabs .nav-link.active {
+                    font-weight: bold;
+                    border-bottom: 4px solid #004085 !important;
+                }
+
+                .nav-link.tab-blue-1 { background-color: #cce5ff; }
+                .nav-link.tab-blue-2 { background-color: #b3d7ff; }
+                .nav-link.tab-blue-3 { background-color: #99ccff; }
+                .nav-link.tab-blue-4 { background-color: #80bfff; }
+                .nav-link.tab-blue-5 { background-color: #66b2ff; }
+
+            </style>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- Nav Tabs -->
+                <ul class="nav nav-tabs mb-4" id="agregadoTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link tab-blue-1 active" id="pessoal-tab" data-toggle="tab" href="#pessoal" role="tab">📄 <strong>Dados Pessoais</strong></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link tab-blue-2" id="contato-tab" data-toggle="tab" href="#contato" role="tab">📱 <strong>Contato</strong></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link tab-blue-3" id="veiculo-tab" data-toggle="tab" href="#veiculo" role="tab">🚚 <strong>Veículo</strong></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link tab-blue-4" id="financeiro-tab" data-toggle="tab" href="#financeiro" role="tab">🏦 <strong>Financeiro</strong></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link tab-blue-5" id="adicionais-tab" data-toggle="tab" href="#adicionais" role="tab">📌 <strong>Informações Adicionais</strong></a>
+                    </li>
+                    
+                </ul>
+
+                <div class="tab-content" id="agregadoTabsContent">
+                    <!-- Aba 1: Dados Pessoais -->
+                    <div class="tab-pane fade show active" id="pessoal" role="tabpanel">
+                        <h5 class="mt-3 mb-4 text-primary">
+                            <i class="fas fa-id-card"></i> Dados Pessoais
+                        </h5>
+                        <div class="row">
+                            <div class="form-group col-md-6">{{ form.nome_completo.label_tag }} {{ form.nome_completo|add_class:"form-control" }}</div>
+                            <div class="form-group col-md-3">{{ form.cpf.label_tag }} {{ form.cpf|add_class:"form-control" }}</div>
+                            <div class="form-group col-md-3">{{ form.rg.label_tag }} {{ form.rg|add_class:"form-control" }}</div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-3">{{ form.orgao_emissor.label_tag }} {{ form.orgao_emissor|add_class:"form-control" }}</div>
+                            <div class="form-group col-md-3">{{ form.data_emissao_rg.label_tag }} {{ form.data_emissao_rg|add_class:"form-control" }}</div>
+                            <div class="form-group col-md-2">{{ form.data_nascimento.label_tag }} {{ form.data_nascimento|add_class:"form-control" }}</div>
+                            <div class="form-group col-md-3">{{ form.cnh.label_tag }} {{ form.cnh|add_class:"form-control" }}</div>
+                        </div>                        
+                    </div>
+
+                    <!-- Aba 2: Contato -->
+                    <div class="tab-pane fade" id="contato" role="tabpanel">
+
+                        <!-- Título Contato -->
+                        <h5 class="mt-3 mb-3 text-primary">
+                            <i class="fas fa-phone-alt"></i> Contato
+                        </h5>
+
+                        <div class="row">
+                            <div class="form-group col-md-4">
+                                {{ form.telefone.label_tag }} {{ form.telefone|add_class:"form-control" }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ form.celular.label_tag }} {{ form.celular|add_class:"form-control" }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ form.celular2.label_tag }} {{ form.celular2|add_class:"form-control" }}
+                            </div>
+                        </div>
+
+                        <div class="form-group ">
+                            {{ form.email.label_tag }} {{ form.email|add_class:"form-control" }}
+                        </div>
+
+                        <!-- Divisor -->
+                        <hr class="my-4">
+                        
+                        <!-- Título Endereço -->
+                        <h5 class="mb-3 text-primary">
+                            <i class="fas fa-map-marker-alt"></i> Endereço
+                        </h5>
+
+                        <div class="row">
+                            <div class="form-group col-md-2">
+                                {{ form.cep.label_tag }} {{ form.cep|add_class:"form-control"|attr:"id:id_cep" }}
+                            </div>
+                            <div class="form-group col-md-6">
+                                {{ form.rua.label_tag }} {{ form.rua|add_class:"form-control"|attr:"id:id_rua" }}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ form.numero.label_tag }} {{ form.numero|add_class:"form-control" }}
+                            </div>
+                            
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                {{ form.cidade.label_tag }} {{ form.cidade|add_class:"form-control"|attr:"id:id_cidade" }}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ form.bairro.label_tag }} {{ form.bairro|add_class:"form-control"|attr:"id:id_bairro" }}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ form.estado.label_tag }} {{ form.estado|add_class:"form-control"|attr:"id:id_uf" }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aba 3: Veículo -->
+                    <div class="tab-pane fade" id="veiculo" role="tabpanel">
+                        <h5 class="mt-3 mb-4 text-primary">
+                            <i class="fas fa-truck"></i> Informações do Veículo
+                        </h5>
+                        <div class="row">
+                            <div class="form-group col-md-4">
+                                {{ form.tipo_veiculo.label_tag }} {{ form.tipo_veiculo|add_class:"form-control" }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ form.marca_modelo.label_tag }} {{ form.marca_modelo|add_class:"form-control" }}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{ form.ano_fabricacao.label_tag }} {{ form.ano_fabricacao|add_class:"form-control" }}
+                            </div>
+                            
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-2">
+                                {{ form.cor.label_tag }} {{ form.cor|add_class:"form-control" }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ form.placa.label_tag }} {{ form.placa|add_class:"form-control" }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ form.capacidade_carga.label_tag }} {{ form.capacidade_carga|add_class:"form-control" }}
+                            </div>
+                        </div>    
+                    </div>
+
+                    <!-- Aba 4: Financeiro -->
+                    <div class="tab-pane fade" id="financeiro" role="tabpanel">
+                        <h5 class="mt-3 mb-4 text-primary">
+                            <i class="fas fa-university"></i> Dados Financeiros
+                        </h5>
+                        <div class="row">
+                            <div class="form-group col-md-4">
+                                {{ form.banco.label_tag }} {{ form.banco|add_class:"form-control" }}
+                            </div>
+                            <div class="form-group col-md-3">
+                                {{ form.agencia.label_tag }} {{ form.agencia|add_class:"form-control" }}
+                            </div>
+                            <div class="form-group col-md-3">
+                                {{ form.conta.label_tag }} {{ form.conta|add_class:"form-control" }}
+                            </div>
+                            
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-2">
+                                {{ form.tipo_conta.label_tag }} {{ form.tipo_conta|add_class:"form-control" }}
+                            </div>
+                            <div class="form-group col-md-6">
+                                {{ form.pix.label_tag }} {{ form.pix|add_class:"form-control" }}
+                            </div>
+                        </div>                            
+                    </div>
+                    
+                    <!-- Aba 5: Informações Adicionais -->
+                    <div class="tab-pane fade" id="adicionais" role="tabpanel">
+                        <h5 class="mt-4 mb-3 text-primary">
+                            <i class="fas fa-map-marker-alt"></i> Outras Informações
+                        </h5>
+
+                        <div class="row">
+                            <div class="form-group col-md-4">
+                                {{ form.cidade_base.label_tag }} {{ form.cidade_base|add_class:"form-control" }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ form.disponibilidade.label_tag }} {{ form.disponibilidade|add_class:"form-control" }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ form.ultima_roteirizacao.label_tag }} {{ form.ultima_roteirizacao|add_class:"form-control" }}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="button" id="btnVoltar" class="btn btn-secondary px-4 mr-2">Voltar</button>
+                    <button type="button" id="btnProximo" class="btn btn-primary px-4 mr-2">Próximo</button>
+                    <button type="submit" id="btnSalvar" class="btn btn-success px-5">Salvar</button>
+                    <a href="{% url 'index' %}" class="btn btn-outline-danger px-4 ml-2">Cancelar</a>
+                </div>
+
+                <script>
+                    document.querySelector('form').addEventListener('submit', function(e) {
+                        // Exibe todas as abas antes de submeter para evitar erro de campos ocultos
+                        document.querySelectorAll('.tab-pane').forEach(tab => tab.classList.add('show', 'active'));
+                    });
+                </script>
+                       
+                
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

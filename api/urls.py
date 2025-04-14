@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
 from .views import ClienteCreateAPIView, CotacaoCreateAPIView, cadastrar_cotacao, CadastrarCotacaoView,  ClienteListAPIView, ClienteDetailAPIView
-from .views import MotoristaListView, MotoristaCreateView, MotoristaUpdateView, MotoristaDeleteView
+from .views import MotoristaListView, MotoristaCreateView, MotoristaUpdateView, MotoristaDeleteView, MotoristaAgregadoCreateView, MotoristaAgregadoUpdateView
 from .views import consultar_endereco
 
 urlpatterns = [
@@ -31,6 +31,8 @@ urlpatterns = [
     path('motoristas/add/', MotoristaCreateView.as_view(), name='motorista_create'),  # URL para criação de motorista
     path('motoristas/<int:pk>/edit/', MotoristaUpdateView.as_view(), name='motorista_update'),
     path('motoristas/<int:pk>/delete/', MotoristaDeleteView.as_view(), name='motorista_delete'),
+    path('agregado/agregado/novo/', MotoristaAgregadoCreateView.as_view(), name='motorista_agregado_create'),
+    path('agregado/agregado/<int:pk>/editar/', MotoristaAgregadoUpdateView.as_view(), name='motorista_agregado_update'),
 
     path('cotacao/cadastrar/', views.cadastrar_cotacao, name='cadastrar_cotacao'),
     path('cotacao/', views.ListarCotacoesView.as_view(), name='listar_cotacao'),  # Para visualizar todas as cotações

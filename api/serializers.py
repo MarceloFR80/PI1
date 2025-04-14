@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Cliente
 from .models import Cotacao 
+
 class ClienteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cliente

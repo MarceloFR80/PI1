@@ -15,8 +15,8 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from .models import Motorista, Cotacao
-from .forms import MotoristaForm
+from .models import Motorista, Cotacao, Agregado
+from .forms import MotoristaForm, AgregadoForm
 from django.db.models import Q
 from django.db.models import Sum  
 from .models import Financeiro
@@ -47,14 +47,6 @@ def index(request):
 def listar_clientes(request):
     clientes = Cliente.objects.all()
     return render(request, 'listar_clientes.html', {'clientes': clientes})
-
-
-# def listar_clientes(request):
-    # Aqui você pode buscar os clientes do banco de dados e passar para o template
-    #return render(request, 'listar_clientes.html')
-
-# def cadastrar_clientes(request):
-  #  return render(request, 'cadastrar_clientes.html')
 
   #---------------------------------------//////////////////////////--------------------------------------
 def cadastrar_clientes(request):
@@ -111,42 +103,37 @@ def cadastrar_cotacao(request):
         return Response({"status": "success", "message": "Cotação cadastrada com sucesso"}, status=status.HTTP_201_CREATED)
     return Response({"status": "error", "errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-
-
-#class ListarCotacaoView(APIView):
-    # def get(self, request, *args, **kwargs):
-       # cotacoes = Cotacao.objects.all()
-       # serializer = CotacaoSerializer(cotacoes, many=True)
-        #return Response(serializer.data, status=status.HTTP_200_OK)
-
 #---------------------------------------------------------/////---------------------------------------------
 class MotoristaListView(ListView):
     model = Motorista
     template_name = 'motoristas/motorista_list.html'
     context_object_name = 'object_list'
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         nome = self.request.GET.get('nome')
         cpf_cnpj = self.request.GET.get('cpf_cnpj')
 
+        queryset = self.get_queryset()
         if nome:
             queryset = queryset.filter(nome__icontains=nome)
         if cpf_cnpj:
             queryset = queryset.filter(cpf_cnpj__icontains=cpf_cnpj)
 
-        return queryset
+        context['object_list'] = queryset
+        context['agregados'] = Agregado.objects.all()
+        return context
 
 class MotoristaCreateView(CreateView):
     model = Motorista
-    form_class = MotoristaForm  # ← Aqui está a mudança
+    form_class = MotoristaForm  
     template_name = 'motoristas/motorista_create.html'
     success_url = reverse_lazy('motorista_list')
 
 
 class MotoristaUpdateView(UpdateView):
     model = Motorista
-    form_class = MotoristaForm  # ← Aqui também
+    form_class = MotoristaForm  
     template_name = 'motoristas/motorista_create.html'
     success_url = reverse_lazy('motorista_list')
 
@@ -155,6 +142,18 @@ class MotoristaDeleteView(DeleteView):
     template_name = 'motoristas/motorista_confirm_delete.html'
     success_url = reverse_lazy('motorista_list')
 
+#---------------------------------------------MOTORISTAS AGREGADOS-----------------------------------------
+class MotoristaAgregadoCreateView(CreateView):
+    model = Agregado
+    form_class = AgregadoForm
+    template_name = 'agregado/motorista_agregado.html'
+    success_url = reverse_lazy('index')
+
+class MotoristaAgregadoUpdateView(UpdateView):
+    model = Agregado
+    form_class = AgregadoForm
+    template_name = 'agregado/motorista_agregado.html'
+    success_url = reverse_lazy('index')
 #-----------------------------------------------------------------------------------------------------------
 def ordens_coleta_view(request):
     return render(request, 'ordens_coleta.html')  
@@ -246,7 +245,7 @@ def listar_coletas(request):
 
     return render(request, 'listar_coletas.html', {'coletas': coletas})
 
-#-------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------Editar Coleta-----------------------------------------------------------
 def editar_coleta(request, id):
     coleta = get_object_or_404(Cotacao, id=id)
 

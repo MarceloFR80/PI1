@@ -8,6 +8,24 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        .nav-tabs .nav-link {
+            border: none;
+            font-weight: 500;
+            color: #000 !important; /* texto preto */
+        }
+    
+        .nav-link.tab-blue-1 { background-color: #cce5ff; }
+        .nav-link.tab-blue-2 { background-color: #99ccff; }
+        .nav-link.tab-blue-3 { background-color: #66b2ff; }
+        .nav-link.tab-blue-4 { background-color: #3399ff; }
+    
+        .nav-tabs .nav-link.active {
+            border-bottom: 3px solid #004085 !important;
+            font-weight: bold;
+        }
+    </style>
+    
     
 
 </head>
@@ -41,6 +59,7 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="motoristasDropdown">
                         <a class="dropdown-item" href="{% url 'motorista_create' %}">Cadastrar Motorista</a>
+                        <a class="dropdown-item" href="{% url 'motorista_agregado_create' %}">Cadastrar Agregado</a>
                         <a class="dropdown-item" href="{% url 'motorista_list' %}">Listar Motoristas</a>
                     </div>
                 </li>
@@ -98,11 +117,13 @@
     
 
     <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     
     <script src="{% static 'js/calculo_distancia.js' %}"></script>
+    
+   <!--                                                    -API VIACEP-                                                    -->
     <script>
         function buscarEndereco() {
             const cep = document.getElementById("id_cep").value.replace(/\D/g, '');
@@ -116,6 +137,9 @@
                         document.getElementById("id_bairro").value = data.bairro || '';
                         document.getElementById("id_cidade").value = data.localidade || '';
                         document.getElementById("id_uf").value = data.uf || '';
+                        
+                        // FOCO NO CAMPO "Número"
+                        document.getElementById("id_numero").focus();
                     } else {
                         alert("CEP não encontrado.");
                     }
@@ -128,11 +152,11 @@
         document.addEventListener("DOMContentLoaded", function () {
             const campoCep = document.getElementById("id_cep");
             if (campoCep) {
-                // Aciona a busca tanto ao perder o foco quanto ao pressionar TAB
-                campoCep.addEventListener("change", buscarEndereco);  // funciona com TAB
+                campoCep.addEventListener("change", buscarEndereco);
             }
         });
     </script>
+    
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const selectFiltro = document.getElementById("filtro_por");
@@ -167,5 +191,128 @@
             }
         });
     </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const tabsWrapper = document.getElementById("agregadoTabs");
+            const tabsContent = document.getElementById("agregadoTabsContent");
+            const btnProximo = document.getElementById("btnProximo");
+            const btnVoltar = document.getElementById("btnVoltar");
+            const btnSalvar = document.getElementById("btnSalvar");
+    
+            if (tabsWrapper && tabsContent && btnProximo && btnVoltar && btnSalvar) {
+                const tabs = Array.from(tabsWrapper.querySelectorAll('.nav-link'));
+                const tabContents = Array.from(tabsContent.querySelectorAll('.tab-pane'));
+                let currentTabIndex = 0;
+    
+                function updateButtons() {
+                    btnVoltar.style.display = currentTabIndex === 0 ? 'none' : 'inline-block';
+                    btnProximo.style.display = currentTabIndex === tabs.length - 1 ? 'none' : 'inline-block';
+                    btnSalvar.style.display = currentTabIndex === tabs.length - 1 ? 'inline-block' : 'none';
+                }
+    
+                function showTab(index) {
+                    tabs.forEach((tab, i) => {
+                        tab.classList.toggle('active', i === index);
+                    });
+                    tabContents.forEach((pane, i) => {
+                        pane.classList.toggle('show', i === index);
+                        pane.classList.toggle('active', i === index);
+                    });
+                    currentTabIndex = index;
+                    updateButtons();
+                }
+    
+                btnProximo.addEventListener('click', () => {
+                    if (currentTabIndex < tabs.length - 1) {
+                        showTab(currentTabIndex + 1);
+                    }
+                });
+    
+                btnVoltar.addEventListener('click', () => {
+                    if (currentTabIndex > 0) {
+                        showTab(currentTabIndex - 1);
+                    }
+                });
+    
+                tabs.forEach((tab, i) => {
+                    tab.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        showTab(i);
+                    });
+                });
+    
+                // Inicialização
+                showTab(currentTabIndex);
+            }
+        });
+    </script>
+    <script>
+        const abas = ["dados", "endereco"];
+        let abaAtual = 0;
+    
+        function atualizarVisibilidadeBotoes() {
+            document.getElementById("btnVoltar").style.display = abaAtual > 0 ? "inline-block" : "none";
+            document.getElementById("btnProximo").style.display = abaAtual < abas.length - 1 ? "inline-block" : "none";
+            document.getElementById("btnSalvar").classList.toggle("d-none", abaAtual !== abas.length - 1);
+        }
+    
+        document.getElementById("btnProximo").addEventListener("click", function () {
+            if (abaAtual < abas.length - 1) {
+                abaAtual++;
+                irParaAba(abas[abaAtual]);
+                atualizarVisibilidadeBotoes();
+            }
+        });
+    
+        document.getElementById("btnVoltar").addEventListener("click", function () {
+            if (abaAtual > 0) {
+                abaAtual--;
+                irParaAba(abas[abaAtual]);
+                atualizarVisibilidadeBotoes();
+            }
+        });
+    
+        function irParaAba(abaId) {
+            $('#clienteTabs a[href="#' + abaId + '"]').tab('show');
+        }
+    
+        // Inicializa
+        document.addEventListener("DOMContentLoaded", function () {
+            atualizarVisibilidadeBotoes();
+        });
+    </script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector("form");
+        form.addEventListener("submit", function (event) {
+            // Força todas as abas a ficarem visíveis antes de submeter
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.add('show', 'active');
+            });
+
+            // Ativa visualmente a aba onde está o erro, se houver
+            const invalid = form.querySelector(':invalid');
+            if (invalid) {
+                const pane = invalid.closest('.tab-pane');
+                if (pane && pane.id) {
+                    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('show', 'active'));
+                    document.querySelectorAll('.nav-link').forEach(tab => tab.classList.remove('active'));
+
+                    // Ativa a aba com o campo inválido
+                    pane.classList.add('show', 'active');
+                    const tab = document.querySelector(`.nav-link[href="#${pane.id}"]`);
+                    if (tab) tab.classList.add('active');
+
+                    // Foca o campo com erro
+                    invalid.focus();
+                    event.preventDefault(); // impede envio até corrigir
+                }
+            }
+        });
+    });
+</script>
+
 </body>
 </html>

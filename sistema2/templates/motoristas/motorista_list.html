@@ -82,11 +82,36 @@
                         </td>
                     </tr>
                 {% empty %}
+                    <tr><td colspan="9">Nenhum motorista encontrado.</td></tr>
+                {% endfor %}
+            
+                <!-- Divisão visual -->
+                <tr class="table-info text-center font-weight-bold">
+                    <td colspan="9">Motoristas Agregados</td>
+                </tr>
+            
+                {% for agregado in agregados %}
                     <tr>
-                        <td colspan="9">Nenhum motorista encontrado.</td>
+                        <td>{{ agregado.nome_completo }}</td>
+                        <td>Agregado</td>
+                        <td>{{ agregado.cpf }}</td>
+                        <td>{{ agregado.telefone }}</td>
+                        <td>{{ agregado.email }}</td>
+                        <td>{{ agregado.tipo_veiculo }}</td>
+                        <td>{{ agregado.placa }}</td>
+                        <td>{{ agregado.celular }}</td>
+                        <td>
+                            <a class="btn btn-warning btn-sm mr-1" href="#" title="Editar">
+                                <i class="fas fa-pencil-alt"></i>
+                            </a>
+                            <a class="btn btn-danger btn-sm" href="#" title="Excluir">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
+            
         </table>
     </div>
 </div>
