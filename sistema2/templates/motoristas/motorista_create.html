@@ -2,8 +2,8 @@
 {% load widget_tweaks %}
 
 {% block content %}
-<div class="container mt-5 d-flex justify-content-center">
-    <div class="card shadow-lg p-4" style="width: 100%; max-width: 900px;">
+<div class="container mt-5">
+    <div class="card shadow-lg">
         <div class="card-header bg-primary text-white text-center">
             <h3>{{ object.id|yesno:"Editar Motorista,Adicionar Motorista" }}</h3>
         </div>
@@ -11,65 +11,99 @@
             <form method="post">
                 {% csrf_token %}
 
-                <div class="form-row">
-                    <div class="form-group col-md-4">
-                        <label for="id_nome">Nome:</label>
-                        {{ form.nome|add_class:"form-control" }}
+                <!-- Nav Tabs -->
+                <ul class="nav nav-tabs mb-4" id="motoristaTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active tab-blue-1" data-toggle="tab" href="#pessoal" role="tab">🧍 Dados Pessoais</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link tab-blue-2" data-toggle="tab" href="#veiculo" role="tab">🚚 Dados do Veículo</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <!-- Aba 1: Dados Pessoais -->
+                    <div class="tab-pane fade show active" id="pessoal" role="tabpanel">
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                {{ form.nome.label_tag }} {{ form.nome|add_class:"form-control" }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ form.cpf_cnpj.label_tag }} {{ form.cpf_cnpj|add_class:"form-control" }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ form.email.label_tag }} {{ form.email|add_class:"form-control" }}
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                {{ form.celular.label_tag }} {{ form.celular|add_class:"form-control" }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ form.telefone.label_tag }} {{ form.telefone|add_class:"form-control" }}
+                            </div>
+                            {{ form.tipo }} <!-- Oculto -->
+                        </div>
                     </div>
-                    <div class="form-group col-md-4">
-                        <label for="id_cpf_cnpj">CPF/CNPJ:</label>
-                        {{ form.cpf_cnpj|add_class:"form-control" }}
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="id_email">Email:</label>
-                        {{ form.email|add_class:"form-control" }}
+
+                    <!-- Aba 2: Dados do Veículo -->
+                    <div class="tab-pane fade" id="veiculo" role="tabpanel">
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                {{ form.tipo_de_veiculo.label_tag }} {{ form.tipo_de_veiculo|add_class:"form-control" }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ form.placa.label_tag }} {{ form.placa|add_class:"form-control" }}
+                            </div>
+                            <div class="form-group col-md-4">
+                                {{ form.cidade_base.label_tag }} {{ form.cidade_base|add_class:"form-control" }}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                {{ form.disponibilidade.label_tag }} {{ form.disponibilidade|add_class:"form-control" }}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group col-md-4">
-                        <label for="id_celular">Celular:</label>
-                        {{ form.celular|add_class:"form-control" }}
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="id_telefone">Telefone:</label>
-                        {{ form.telefone|add_class:"form-control" }}
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="id_tipo">Tipo de Motorista:</label>
-                        {{ form.tipo|add_class:"form-control" }}
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group col-md-4">
-                        <label for="id_tipo_de_veiculo">Tipo de Veículo:</label>
-                        {{ form.tipo_de_veiculo|add_class:"form-control" }}
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="id_placa">Placa:</label>
-                        {{ form.placa|add_class:"form-control" }}
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label for="id_cidade_base">Cidade Base:</label>
-                        {{ form.cidade_base|add_class:"form-control" }}
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group col-md-4">
-                        <label for="id_disponibilidade">Disponibilidade:</label>
-                        {{ form.disponibilidade|add_class:"form-control" |attr:"style:min-height: 40px; line-height: 1.4;" }}
-                    </div>
-                </div>
-                
-
+                <!-- Botões -->
                 <div class="text-center mt-4">
-                    <button type="submit" class="btn btn-primary px-5">Salvar Motorista</button>
-                    <a href="{% url 'motorista_list' %}" class="btn btn-secondary px-5 ml-2">Cancelar</a>
+                    <button type="button" id="btnVoltar" class="btn btn-secondary px-4 mr-2 d-none">Voltar</button>
+                    <button type="button" id="btnProximo" class="btn btn-primary px-4 mr-2">Próximo</button>
+                    <button type="submit" id="btnSalvar" class="btn btn-success px-5 d-none">Salvar</button>
+                    <a href="{% url 'motorista_list' %}" class="btn btn-outline-danger px-4 ml-2">Cancelar</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<style>
+    .tab-blue-1 { background-color: #cce5ff !important; }
+    .tab-blue-2 { background-color: #99ccff !important; }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const btnProximo = document.getElementById('btnProximo');
+        const btnVoltar = document.getElementById('btnVoltar');
+        const btnSalvar = document.getElementById('btnSalvar');
+
+        btnProximo.addEventListener('click', function () {
+            $('#motoristaTabs a[href="#veiculo"]').tab('show');
+            btnProximo.classList.add('d-none');
+            btnVoltar.classList.remove('d-none');
+            btnSalvar.classList.remove('d-none');
+        });
+
+        btnVoltar.addEventListener('click', function () {
+            $('#motoristaTabs a[href="#pessoal"]').tab('show');
+            btnProximo.classList.remove('d-none');
+            btnVoltar.classList.add('d-none');
+            btnSalvar.classList.add('d-none');
+        });
+    });
+</script>
 {% endblock %}

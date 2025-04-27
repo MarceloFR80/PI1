@@ -41,10 +41,16 @@
 <div class="container text-center mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="display-5">Lista de Motoristas</h1>
-        <a class="btn btn-primary btn-lg" href="{% url 'motorista_create' %}">
-            <i class="fas fa-plus"></i> Novo Motorista
-        </a>
+        <div>
+            <a class="btn btn-primary btn-lg mr-2" href="{% url 'motorista_create' %}">
+                <i class="fas fa-plus"></i> Novo Motorista
+            </a>
+            <a class="btn btn-success btn-lg" href="{% url 'motorista_agregado_create' %}">
+                <i class="fas fa-plus"></i> Novo Motorista Agregado
+            </a>
+        </div>
     </div>
+    
 
     <div class="table-responsive">
         <table class="table table-striped table-hover table-bordered text-center align-middle">
@@ -61,8 +67,12 @@
                     <th>Ações</th>
                 </tr>
             </thead>
+            <tr class="table-info text-center font-weight-bold">
+                <td colspan="9">Motoristas Agregados</td>
+            </tr>
             <tbody>
                 {% for motorista in object_list %}
+                
                     <tr>
                         <td>{{ motorista.nome }}</td>
                         <td>{{ motorista.get_tipo_display }}</td>
@@ -101,13 +111,14 @@
                         <td>{{ agregado.placa }}</td>
                         <td>{{ agregado.celular }}</td>
                         <td>
-                            <a class="btn btn-warning btn-sm mr-1" href="#" title="Editar">
+                            <a class="btn btn-warning btn-sm mr-1" href="{% url 'motorista_agregado_update' agregado.pk %}" title="Editar">
                                 <i class="fas fa-pencil-alt"></i>
                             </a>
-                            <a class="btn btn-danger btn-sm" href="#" title="Excluir">
+                            <a class="btn btn-danger btn-sm" href="{% url 'motorista_agregado_delete' agregado.pk %}" title="Excluir">
                                 <i class="fas fa-trash-alt"></i>
                             </a>
                         </td>
+                        
                     </tr>
                 {% endfor %}
             </tbody>

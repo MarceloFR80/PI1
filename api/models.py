@@ -82,6 +82,7 @@ class Cotacao(models.Model):
     status_entrega = models.CharField(max_length=20, choices=STATUS_ENTREGA_CHOICES, default='PENDENTE')
     veiculo = models.CharField(max_length=50, blank=True, null=True)
 
+
     def clean(self):
         if not self.cliente:
             raise ValidationError("Cliente não selecionado.")
@@ -102,7 +103,7 @@ class Motorista(models.Model):
     )
 
     nome = models.CharField(max_length=255)
-    tipo = models.CharField(max_length=2, choices=TIPO_CHOICES)
+    tipo = models.CharField(max_length=2, choices=TIPO_CHOICES, default='PR')
     cpf_cnpj = models.CharField(max_length=18, unique=True)
     celular = models.CharField(max_length=15, default='')
     telefone = models.CharField(max_length=15)
@@ -118,9 +119,11 @@ class Motorista(models.Model):
         return f"{self.nome} ({self.placa})"
 #-----------------------------------------------------------------AGREGADO------------------------------------------------------------
 class Agregado(models.Model):
-    SEXO_CHOICES = [('M', 'Masculino'), ('F', 'Feminino'), ('O', 'Outro')]
+    TIPO_CHOICES = (('PR', 'Próprio'), ('AG', 'Agregado'),)
     DISPONIBILIDADE_CHOICES = [('DISPONIVEL', 'Disponível'), ('INDISPONIVEL', 'Indisponível')]
     TIPO_CONTA_CHOICES = [('PF', 'Pessoa Física'), ('PJ', 'Pessoa Jurídica')]
+
+    tipo = models.CharField(max_length=2, choices=TIPO_CHOICES, default='AG')
 
     # Dados Pessoais
     nome_completo = models.CharField("Nome Completo", max_length=255)

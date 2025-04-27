@@ -92,7 +92,7 @@ class MotoristaForm(forms.ModelForm):
         
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome do Motorista'}),
-            'tipo': forms.Select(attrs={'class': 'form-control'}),
+            'tipo': forms.HiddenInput(attrs={'value': 'PR'}),
             'cpf_cnpj': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'CPF/CNPJ'}),
             'celular': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Celular'}),
             'telefone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telefone'}),
@@ -107,7 +107,7 @@ class MotoristaForm(forms.ModelForm):
             'nome': 'Nome',
             'tipo': 'Tipo de Motorista',
             'cpf_cnpj': 'CPF/CNPJ',
-            'celular': 'Celular',
+            'celular': 'Celular/Whatsapp',
             'telefone': 'Telefone',
             'tipo_de_veiculo': 'Tipo de Veículo',
             'placa': 'Placa do Veículo',

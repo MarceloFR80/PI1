@@ -28,6 +28,8 @@ from django.http import JsonResponse
 from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
+from django.contrib.messages.views import SuccessMessageMixin
+from django.views.decorators.http import require_POST
 #-----------------------------------LOGIN--------------------------------------------------------
 def register(request):
     if request.method == 'POST':
@@ -109,19 +111,32 @@ class MotoristaListView(ListView):
     template_name = 'motoristas/motorista_list.html'
     context_object_name = 'object_list'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_queryset(self):
+        queryset = super().get_queryset()
         nome = self.request.GET.get('nome')
         cpf_cnpj = self.request.GET.get('cpf_cnpj')
 
-        queryset = self.get_queryset()
         if nome:
             queryset = queryset.filter(nome__icontains=nome)
         if cpf_cnpj:
             queryset = queryset.filter(cpf_cnpj__icontains=cpf_cnpj)
 
-        context['object_list'] = queryset
-        context['agregados'] = Agregado.objects.all()
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        nome = self.request.GET.get('nome')
+        cpf_cnpj = self.request.GET.get('cpf_cnpj')
+
+        agregados = Agregado.objects.all()
+
+        if nome:
+            agregados = agregados.filter(nome_completo__icontains=nome)
+        if cpf_cnpj:
+            agregados = agregados.filter(cpf__icontains=cpf_cnpj)
+
+        context['agregados'] = agregados
         return context
 
 class MotoristaCreateView(CreateView):
@@ -147,13 +162,19 @@ class MotoristaAgregadoCreateView(CreateView):
     model = Agregado
     form_class = AgregadoForm
     template_name = 'agregado/motorista_agregado.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('motorista_list')
 
 class MotoristaAgregadoUpdateView(UpdateView):
     model = Agregado
     form_class = AgregadoForm
     template_name = 'agregado/motorista_agregado.html'
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('motorista_list')
+
+class MotoristaAgregadoDeleteView(SuccessMessageMixin, DeleteView):
+    model = Agregado
+    template_name = 'agregado/motorista_agregado_confirm_delete.html'
+    success_url = reverse_lazy('motorista_list')
+    success_message = "Motorista agregado excluído com sucesso!"
 #-----------------------------------------------------------------------------------------------------------
 def ordens_coleta_view(request):
     return render(request, 'ordens_coleta.html')  
@@ -199,7 +220,26 @@ def controle_coletas_view(request):
     }
 
     return render(request, 'controle_coletas.html', context)
-  
+#---------------------------------------------------------------------------------------------------------------
+@require_POST
+def atribuir_coletas(request):
+    coleta_ids = request.POST.getlist('coletas_selecionadas')
+    cpf_motorista = request.POST.get('cpf_motorista')
+    tipo_motorista = request.POST.get('tipo_motorista_origem')
+
+    if not coleta_ids or not cpf_motorista or not tipo_motorista:
+        return JsonResponse({'status': 'erro', 'mensagem': 'Dados incompletos'}, status=400)
+
+    if tipo_motorista == 'PR':
+        motorista = get_object_or_404(Motorista, cpf_cnpj=cpf_motorista)
+    else:
+        motorista = get_object_or_404(Agregado, cpf=cpf_motorista)
+
+    Cotacao.objects.filter(id__in=coleta_ids).update(motorista=motorista)
+
+    return JsonResponse({'status': 'sucesso'})
+
+
 #---------------------------------------------------------------------------------------------------------------
 def financeiro_view(request):
     return render(request, 'financeiro.html')  
@@ -467,5 +507,36 @@ def gerar_pdf_coleta(request, coleta_id):
 #-----------------------------------------------------------------------------------------------------------------------------------------
 #----------------------------------------------Criar Roteirazacao-------------------------------------------------------------------------
 def criar_roteirizacao_view(request):
-    return render(request, 'roteirizacao.html')
+    tipo_filtro = request.GET.get('tipo_motorista', '')
+
+    motoristas = Motorista.objects.all()
+    agregados = Agregado.objects.all()
+
+    # Marcar cada modelo com tipo correspondente
+    for m in motoristas:
+        m.tipo = 'PR'
+
+    for a in agregados:
+        a.tipo = 'AG'
+        a.nome = a.nome_completo
+        a.tipo_de_veiculo = a.tipo_veiculo
+        a.cpf_cnpj = a.cpf  # Adiciona esse atributo
+        a.get_tipo_display = lambda: 'Agregado'
+        a.get_disponibilidade_display = lambda: dict(Agregado.DISPONIBILIDADE_CHOICES).get(a.disponibilidade, a.disponibilidade)
+
+
+    if tipo_filtro == 'PR':
+        motoristas_unificados = list(motoristas)
+    elif tipo_filtro == 'AG':
+        motoristas_unificados = list(agregados)
+    else:
+        motoristas_unificados = list(motoristas) + list(agregados)
+
+    coletas = Cotacao.objects.filter(status_coleta='PENDENTE')
+
+    return render(request, 'roteirizacao.html', {
+        'motoristas_unificados': motoristas_unificados,
+        'coletas': coletas,
+    })
+
 #-----------------------------------------------------------------------------------------------------------------------------------------

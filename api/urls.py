@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
 from .views import ClienteCreateAPIView, CotacaoCreateAPIView, cadastrar_cotacao, CadastrarCotacaoView,  ClienteListAPIView, ClienteDetailAPIView
-from .views import MotoristaListView, MotoristaCreateView, MotoristaUpdateView, MotoristaDeleteView, MotoristaAgregadoCreateView, MotoristaAgregadoUpdateView
+from .views import MotoristaListView, MotoristaCreateView, MotoristaUpdateView, MotoristaDeleteView, MotoristaAgregadoCreateView, MotoristaAgregadoUpdateView, MotoristaAgregadoDeleteView
 from .views import consultar_endereco
 
 urlpatterns = [
@@ -31,8 +31,11 @@ urlpatterns = [
     path('motoristas/add/', MotoristaCreateView.as_view(), name='motorista_create'),  # URL para criação de motorista
     path('motoristas/<int:pk>/edit/', MotoristaUpdateView.as_view(), name='motorista_update'),
     path('motoristas/<int:pk>/delete/', MotoristaDeleteView.as_view(), name='motorista_delete'),
-    path('agregado/agregado/novo/', MotoristaAgregadoCreateView.as_view(), name='motorista_agregado_create'),
-    path('agregado/agregado/<int:pk>/editar/', MotoristaAgregadoUpdateView.as_view(), name='motorista_agregado_update'),
+
+    path('agregado/novo/', MotoristaAgregadoCreateView.as_view(), name='motorista_agregado_create'),
+    path('agregado/<int:pk>/editar/', MotoristaAgregadoUpdateView.as_view(), name='motorista_agregado_update'),
+    path('agregado/<int:pk>/excluir/', MotoristaAgregadoDeleteView.as_view(), name='motorista_agregado_delete'),
+
 
     path('cotacao/cadastrar/', views.cadastrar_cotacao, name='cadastrar_cotacao'),
     path('cotacao/', views.ListarCotacoesView.as_view(), name='listar_cotacao'),  # Para visualizar todas as cotações
@@ -43,6 +46,8 @@ urlpatterns = [
     path('coletas/<int:id>/editar/', views.editar_coleta, name='editar_coleta'),
     path('coletas/<int:id>/excluir/', views.excluir_coleta, name='excluir_coleta'),
     path('coletas/cadastrar/', views.cadastrar_coleta, name='cadastrar_coleta'),
+
+    path('atribuir-coletas/', views.atribuir_coletas, name='atribuir_coletas'),
 
     path('ordens-coleta/', views.ordens_coleta_view, name='ordens_coleta'),  
     path('controle-coletas/', views.controle_coletas_view, name='controle_coletas'),
@@ -60,5 +65,6 @@ urlpatterns = [
     
     path('coletas/<int:coleta_id>/resumo_pdf/', views.gerar_pdf_coleta, name='resumo_pdf_coleta'),
     path('roteirizacao/criar/', views.criar_roteirizacao_view, name='criar_roteirizacao'),
-
+    path('roteirizacao/criar/', views.criar_roteirizacao_view, name='criar_roteirizacao'),
+    path('roteirizacao/atribuir/', views.atribuir_coletas, name='atribuir_coletas'),
 ]

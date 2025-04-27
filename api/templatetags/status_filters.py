@@ -1,4 +1,5 @@
 from django import template
+from datetime import date
 
 register = template.Library()
 
@@ -13,3 +14,10 @@ def status_color(value):
         return 'danger'
     return 'secondary'
 
+@register.filter
+def is_coleta_atrasada(coleta):
+    return coleta.status_coleta == "PENDENTE" and coleta.data_coleta < date.today()
+
+@register.filter
+def is_entrega_atrasada(coleta):
+    return coleta.status_entrega == "PENDENTE" and coleta.data_coleta < date.today()
