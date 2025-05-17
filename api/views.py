@@ -30,6 +30,9 @@ from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.decorators.http import require_POST
+
+from .models import TodosMotoristas, Cotacao, Roteirizacao
+from .forms import TodosMotoristasForm
 #-----------------------------------LOGIN--------------------------------------------------------
 def register(request):
     if request.method == 'POST':
@@ -56,7 +59,7 @@ def cadastrar_clientes(request):
         form = ClienteForm(request.POST)
         if form.is_valid():
             form.save()  # Salva no banco de dados
-            messages.success(request, "Cliente cadastrado com sucesso!")
+           # messages.success(request, "Cliente cadastrado com sucesso!")
             return redirect('index')  # Redireciona após o sucesso
         else:
             messages.error(request, "Erro ao cadastrar cliente. Verifique os dados.")
@@ -190,7 +193,7 @@ def controle_coletas_view(request):
     coletas = Cotacao.objects.all()
 
     if placa:
-        coletas = coletas.filter(veiculo__icontains=placa)  # Certifique-se que o campo correto seja 'veiculo'
+        coletas = coletas.filter(veiculo__icontains=placa)
     if cliente:
         coletas = coletas.filter(cliente__nome_razaosocial__icontains=cliente)
     if data_inicio and data_fim:
@@ -208,6 +211,16 @@ def controle_coletas_view(request):
     entregas_realizadas = coletas.filter(status_entrega='realizada').count()
     entregas_pendentes = coletas.filter(status_entrega='pendente').count()
 
+    #  últimas roteirizações
+    roteirizacoes = Roteirizacao.objects.select_related('motorista').prefetch_related('coletas').order_by('-data')[:20]
+
+    # Marcar se há pendências em cada roteirização
+    for roteiro in roteirizacoes:
+        roteiro.tem_pendencias = any(
+            c.status_coleta != 'REALIZADA' or c.status_entrega != 'ENTREGUE'
+            for c in roteiro.coletas.all()
+        )
+
     context = {
         'coletas': coletas,
         'motoristas': Motorista.objects.all(),
@@ -217,28 +230,34 @@ def controle_coletas_view(request):
         'coletas_nao_realizadas': coletas_nao_realizadas,
         'entregas_realizadas': entregas_realizadas,
         'entregas_pendentes': entregas_pendentes,
+        'roteirizacoes': roteirizacoes,
     }
 
     return render(request, 'controle_coletas.html', context)
+
 #---------------------------------------------------------------------------------------------------------------
 @require_POST
 def atribuir_coletas(request):
     coleta_ids = request.POST.getlist('coletas_selecionadas')
     cpf_motorista = request.POST.get('cpf_motorista')
-    tipo_motorista = request.POST.get('tipo_motorista_origem')
 
-    if not coleta_ids or not cpf_motorista or not tipo_motorista:
+    if not coleta_ids or not cpf_motorista:
         return JsonResponse({'status': 'erro', 'mensagem': 'Dados incompletos'}, status=400)
 
-    if tipo_motorista == 'PR':
-        motorista = get_object_or_404(Motorista, cpf_cnpj=cpf_motorista)
-    else:
-        motorista = get_object_or_404(Agregado, cpf=cpf_motorista)
+    try:
+       # Após salvar a roteirização e atribuir coletas
+            motorista = TodosMotoristas.objects.get(cpf_cnpj=cpf_motorista)
+            motorista.disponibilidade = 'INDISPONIVEL'
+            motorista.save()
 
-    Cotacao.objects.filter(id__in=coleta_ids).update(motorista=motorista)
+    except TodosMotoristas.DoesNotExist:
+        return JsonResponse({'status': 'erro', 'mensagem': 'Motorista não encontrado'}, status=404)
 
-    return JsonResponse({'status': 'sucesso'})
+    roteirizacao = Roteirizacao.objects.create(motorista=motorista)
+    roteirizacao.coletas.add(*Cotacao.objects.filter(id__in=coleta_ids))
 
+    return redirect('controle_coletas')
+    #return JsonResponse({'status': 'sucesso'})
 
 #---------------------------------------------------------------------------------------------------------------
 def financeiro_view(request):
@@ -399,7 +418,8 @@ def cadastrar_coleta(request):
             )
 
             coleta.save()
-            messages.success(request, f"Coleta cadastrada com sucesso! Valor do frete: R$ {coleta.valor_frete}")
+            #messages.success(request, f"Coleta cadastrada com sucesso! Valor do frete: R$ {coleta.valor_frete}")
+            #messages.success(request, f"Coleta cadastrada com sucesso!")
             return redirect('listar_coletas')
         else:
             messages.error(request, 'Erro ao cadastrar a coleta. Verifique os dados e tente novamente.')
@@ -481,7 +501,7 @@ def buscar_enderecos_da_coleta(request, coleta_id):
             'cidade_origem': coleta.cliente.cidade,
             'uf_origem': coleta.cliente.uf,
             'cep_destino': coleta.cep_destino,
-            # Aqui você pode adicionar campos futuros de destino, se existirem.
+            
         }
         return JsonResponse(data)
     except Cotacao.DoesNotExist:
@@ -509,34 +529,72 @@ def gerar_pdf_coleta(request, coleta_id):
 def criar_roteirizacao_view(request):
     tipo_filtro = request.GET.get('tipo_motorista', '')
 
-    motoristas = Motorista.objects.all()
-    agregados = Agregado.objects.all()
+    motoristas = TodosMotoristas.objects.all()
+    if tipo_filtro:
+        motoristas = motoristas.filter(tipo=tipo_filtro)
 
-    # Marcar cada modelo com tipo correspondente
-    for m in motoristas:
-        m.tipo = 'PR'
-
-    for a in agregados:
-        a.tipo = 'AG'
-        a.nome = a.nome_completo
-        a.tipo_de_veiculo = a.tipo_veiculo
-        a.cpf_cnpj = a.cpf  # Adiciona esse atributo
-        a.get_tipo_display = lambda: 'Agregado'
-        a.get_disponibilidade_display = lambda: dict(Agregado.DISPONIBILIDADE_CHOICES).get(a.disponibilidade, a.disponibilidade)
-
-
-    if tipo_filtro == 'PR':
-        motoristas_unificados = list(motoristas)
-    elif tipo_filtro == 'AG':
-        motoristas_unificados = list(agregados)
-    else:
-        motoristas_unificados = list(motoristas) + list(agregados)
-
-    coletas = Cotacao.objects.filter(status_coleta='PENDENTE')
+    # Filtrar coletas ainda não roteirizadas
+    coletas_ja_usadas = Roteirizacao.objects.values_list('coletas__id', flat=True)
+    coletas = Cotacao.objects.filter(status_coleta='PENDENTE').exclude(id__in=coletas_ja_usadas)
 
     return render(request, 'roteirizacao.html', {
-        'motoristas_unificados': motoristas_unificados,
+        'motoristas_unificados': motoristas,
         'coletas': coletas,
     })
-
 #-----------------------------------------------------------------------------------------------------------------------------------------
+@require_POST
+def finalizar_roteirizacao(request, roteiro_id):
+    roteiro = get_object_or_404(Roteirizacao, id=roteiro_id)
+
+    # Finaliza todas as coletas
+    for coleta in roteiro.coletas.all():
+        coleta.status_coleta = 'REALIZADA'
+        coleta.status_entrega = 'ENTREGUE'
+        coleta.save()
+
+    # Torna o motorista disponível novamente
+    motorista = roteiro.motorista
+    motorista.disponibilidade = 'DISPONIVEL'
+    motorista.save()
+
+    return JsonResponse({'status': 'sucesso'})
+#-----------------------------------------------------------------------------------------------------------------------------------------
+class TodosMotoristasCreateView(CreateView):
+    model = TodosMotoristas
+    form_class = TodosMotoristasForm
+    template_name = 'todosmotoristas/cad_td_motoristas.html'
+    success_url = reverse_lazy('todosmotoristas_list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['campos_pessoais'] = ['nome', 'tipo', 'cpf_cnpj', 'rg', 'orgao_emissor', 'data_emissao_rg', 'cnh', 'data_nascimento']
+        context['campos_contato'] = ['telefone', 'celular', 'celular2', 'email']
+        context['campos_endereco'] = ['cep', 'rua', 'numero', 'bairro', 'cidade', 'estado']
+        context['campos_veiculo'] = ['tipo_de_veiculo', 'marca_modelo', 'ano_fabricacao', 'placa', 'cor', 'capacidade_carga', 'cidade_base', 'disponibilidade', 'ultima_roteirizacao']
+        context['campos_financeiro'] = ['banco', 'agencia', 'conta', 'tipo_conta', 'pix']
+        return context
+
+
+class TodosMotoristasListView(ListView):
+    model = TodosMotoristas
+    template_name = 'todosmotoristas/listar_tdmotoristas.html'
+    context_object_name = 'motoristas'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        tipo = self.request.GET.get('tipo_motorista')
+        if tipo in ['PR', 'AG']:
+            queryset = queryset.filter(tipo=tipo)
+        return queryset
+
+
+class TodosMotoristasUpdateView(UpdateView):
+    model = TodosMotoristas
+    form_class = TodosMotoristasForm
+    template_name = 'todosmotoristas/cad_td_motoristas.html'  # Pode usar o mesmo do cadastro
+    success_url = reverse_lazy('listar_motoristas')
+
+class TodosMotoristasDeleteView(DeleteView):
+    model = TodosMotoristas
+    template_name = 'todosmotoristas/confirmar_exclusao.html'
+    success_url = reverse_lazy('listar_motoristas')

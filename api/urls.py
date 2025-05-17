@@ -3,7 +3,10 @@ from . import views
 from django.contrib.auth import views as auth_views
 from .views import ClienteCreateAPIView, CotacaoCreateAPIView, cadastrar_cotacao, CadastrarCotacaoView,  ClienteListAPIView, ClienteDetailAPIView
 from .views import MotoristaListView, MotoristaCreateView, MotoristaUpdateView, MotoristaDeleteView, MotoristaAgregadoCreateView, MotoristaAgregadoUpdateView, MotoristaAgregadoDeleteView
+from .views import TodosMotoristasCreateView, TodosMotoristasListView, TodosMotoristasUpdateView, TodosMotoristasDeleteView
+from .views import criar_roteirizacao_view, atribuir_coletas  # ou o que mais for necessário
 from .views import consultar_endereco
+from .views import finalizar_roteirizacao
 
 urlpatterns = [
 
@@ -64,7 +67,14 @@ urlpatterns = [
     path('coletas/endereco/<int:coleta_id>/', views.buscar_enderecos_da_coleta, name='buscar_enderecos_da_coleta'),
     
     path('coletas/<int:coleta_id>/resumo_pdf/', views.gerar_pdf_coleta, name='resumo_pdf_coleta'),
-    path('roteirizacao/criar/', views.criar_roteirizacao_view, name='criar_roteirizacao'),
-    path('roteirizacao/criar/', views.criar_roteirizacao_view, name='criar_roteirizacao'),
-    path('roteirizacao/atribuir/', views.atribuir_coletas, name='atribuir_coletas'),
+    #path('roteirizacao/criar/', views.criar_roteirizacao_view, name='criar_roteirizacao'),
+    path('roteirizacao/', criar_roteirizacao_view, name='criar_roteirizacao'),
+    path('roteirizacao/atribuir/', atribuir_coletas, name='atribuir_coletas'),
+    path('roteirizacao/<int:roteiro_id>/finalizar/', finalizar_roteirizacao, name='finalizar_roteirizacao'),
+
+    path('todosmotoristas/add/', TodosMotoristasCreateView.as_view(), name='todosmotoristas_create'),
+    path('todosmotoristas/', TodosMotoristasListView.as_view(), name='todosmotoristas_list'),
+    path('todosmotoristas/<int:pk>/edit/', TodosMotoristasUpdateView.as_view(), name='todosmotoristas_update'),
+    path('todosmotoristas/<int:pk>/delete/', TodosMotoristasDeleteView.as_view(), name='todosmotoristas_delete'),
+
 ]

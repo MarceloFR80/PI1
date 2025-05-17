@@ -1,5 +1,6 @@
 from django import forms
-from .models import Cliente, Cotacao, Motorista, Financeiro, Agregado
+from .models import Cliente, Cotacao, Motorista, Financeiro, Agregado, TodosMotoristas
+
 
 class ClienteForm(forms.ModelForm):
     class Meta:
@@ -226,3 +227,32 @@ class FinanceiroForm(forms.ModelForm):
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         label="Data de Operação"
     )
+#----------------------------------------------------------------------------------------------------------
+
+
+class TodosMotoristasForm(forms.ModelForm):
+    class Meta:
+        model = TodosMotoristas
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super(TodosMotoristasForm, self).__init__(*args, **kwargs)
+
+        # Oculta inicialmente os campos financeiros se tipo for "PR" ou não estiver definido
+        tipo = self.initial.get('tipo') or self.data.get('tipo')
+        if tipo != 'AG':
+            for field in ['banco', 'agencia', 'conta', 'tipo_conta', 'pix']:
+                self.fields[field].required = False
+
+    def clean(self):
+        cleaned_data = super().clean()
+        tipo = cleaned_data.get('tipo')
+
+        # Validação obrigatória apenas para agregados
+        if tipo == 'AG':
+            campos_financeiros = ['banco', 'agencia', 'conta', 'tipo_conta']
+            for campo in campos_financeiros:
+                if not cleaned_data.get(campo):
+                    self.add_error(campo, 'Este campo é obrigatório para motoristas agregados.')
+
+        return cleaned_data

@@ -46,61 +46,65 @@
 <div class="scroll-table mb-3">
     <table class="table table-striped table-bordered align-middle" id="tabela-motoristas">
         <thead class="table-dark align-middle text-center">
-            <tr>
-                <th>ID</th>
-                <th>
-                    <button type="button" id="toggleMotoristas" class="btn btn-sm btn-outline-secondary" title="Mostrar/Ocultar Motoristas">
-                        <i id="iconeVisibilidade" class="fas fa-eye text-warning"></i>
-                    </button>
-                </th>
-                <th>Motorista</th>
-                <th>
-                    <form method="get" id="filtroTipoForm" class="d-flex align-items-center justify-content-center gap-2">
-                        <div>
-                            <label for="tipo_motorista" class="form-label text-white mb-1">Tipo</label>
-                            <select name="tipo_motorista" id="tipo_motorista" class="form-select form-select-sm"
-                                    onchange="document.getElementById('filtroTipoForm').submit();">
-                                <option value="" {% if request.GET.tipo_motorista == "" %}selected{% endif %}>Todos</option>
-                                <option value="PR" {% if request.GET.tipo_motorista == "PR" %}selected{% endif %}>Próprio</option>
-                                <option value="AG" {% if request.GET.tipo_motorista == "AG" %}selected{% endif %}>Agregado</option>
-                            </select>
-                        </div>
-                    </form>
-                </th>
-                <th>Veículo</th>
-                <th>Placa</th>
-                <th>Disponibilidade</th>
-                <th>Última Roteirização</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for m in motoristas_unificados %}
-            <tr>
-                <td class="text-center">{{ m.id }}</td>
-                <td class="text-center">
-                    <input type="radio" name="motorista_select"
-                         class="motorista-radio"
-                         data-cpf="{{ m.cpf_cnpj }}"
-                         data-tipo="{{ m.tipo }}"
-                         data-id="{{ m.id }}">
-                </td>
-                <td>{{ m.nome }}</td>
-                <td>{{ m.get_tipo_display }}</td>
-                <td>{{ m.tipo_de_veiculo }}</td>
-                <td>{{ m.placa }}</td>
-                <td class="text-center">
-                    {% if m.disponibilidade == 'DISPONIVEL' %}
-                    <span class="badge badge-success">Disponível</span>
-                    {% else %}
-                    <span class="badge badge-danger">Indisponível</span>
-                    {% endif %}
-                </td>
-                <td>{{ m.ultima_roteirizacao|date:"d/m/Y" }}</td>
-                <td><!-- ações --></td>
-            </tr>
-            {% endfor %}
-        </tbody>
+    <tr>
+        <th>ID</th>
+        <th>
+            <button type="button" id="toggleMotoristas" class="btn btn-sm btn-outline-secondary" title="Mostrar/Ocultar Motoristas">
+                <i id="iconeVisibilidade" class="fas fa-eye text-warning"></i>
+            </button>
+        </th>
+        <th>Motorista</th>
+        <th>
+            <form method="get" id="filtroTipoForm" class="d-flex align-items-center justify-content-center gap-2">
+                <div>
+                    <label for="tipo_motorista" class="form-label text-white mb-1">Tipo</label>
+                    <select name="tipo_motorista" id="tipo_motorista" class="form-select form-select-sm"
+                            onchange="document.getElementById('filtroTipoForm').submit();">
+                        <option value="" {% if request.GET.tipo_motorista == "" %}selected{% endif %}>Todos</option>
+                        <option value="PR" {% if request.GET.tipo_motorista == "PR" %}selected{% endif %}>Próprio</option>
+                        <option value="AG" {% if request.GET.tipo_motorista == "AG" %}selected{% endif %}>Agregado</option>
+                    </select>
+                </div>
+            </form>
+        </th>
+        <th>Veículo</th>
+        <th>Placa</th>
+        <th>Disponibilidade</th>
+        <th>Última Roteirização</th>
+        <th>Ações</th>
+    </tr>
+</thead>
+<tbody>
+    {% for m in motoristas_unificados %}
+    <tr>
+        <td class="text-center">{{ m.id }}</td>
+        <td class="text-center">
+            <input type="radio" name="motorista_select"
+                   class="motorista-radio"
+                   data-cpf="{{ m.cpf_cnpj }}"
+                   data-tipo="{{ m.tipo }}"
+                   data-id="{{ m.id }}">
+        </td>
+        <td>{{ m.nome }}</td>
+        <td>{{ m.get_tipo_display }}</td>
+        <td>{{ m.tipo_de_veiculo }}</td>
+        <td>{{ m.placa }}</td>
+
+        <td class="text-center">
+            {% if m.disponibilidade == 'INDISPONIVEL' %}
+                <span class="badge bg-danger">Indisponível</span>
+            {% else %}
+                <span class="badge bg-success">Disponível</span>
+            {% endif %}
+        </td>
+
+        <td>{{ m.ultima_roteirizacao|date:"d/m/Y" }}</td>
+        <td></td>
+    </tr>
+    {% endfor %}
+</tbody>
+
+
     </table>
 </div>
 
@@ -221,7 +225,37 @@
                 document.getElementById("tipo_motorista_origem").value = tipoMotorista;
             });
         });
+     
         
+
+        document.querySelector('form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const form = this;
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': form.querySelector('[name="csrfmiddlewaretoken"]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'sucesso') {
+            alert("Coletas atribuídas com sucesso!");
+            window.location.reload();  // recarrega a página com as coletas atualizadas
+        } else {
+            alert("Erro: " + data.mensagem);
+        }
+    })
+    .catch(error => {
+        console.error("Erro ao enviar requisição:", error);
+        alert("Erro inesperado. Tente novamente.");
+    });
+});
+
     </script>
 </div>
 {% endblock %}

@@ -105,8 +105,9 @@
                                 {{ form.cidade|add_class:"form-control"|attr:"id:id_cidade" }}
                             </div>
                             <div class="form-group col-md-4">
-                                {{ form.uf.label_tag }}
-                                {{ form.uf|add_class:"form-control"|attr:"id:id_uf" }}
+                                {{ form.estado.label_tag }}
+                                {{ form.estado|add_class:"form-control"|attr:"id:id_estado" }}
+                                
                             </div>
                         </div>   
                     </div>
@@ -118,7 +119,7 @@
                 <button type="button" id="btnVoltar" class="btn btn-secondary px-4 mr-2">Voltar</button>
                 <button type="button" id="btnProximo" class="btn btn-primary px-4 mr-2">Próximo</button>
                 <button type="submit" id="btnSalvar" class="btn btn-success px-5 d-none">Salvar</button>
-                <a href="{% url 'index' %}" class="btn btn-outline-danger px-4 ml-2">Cancelar</a>
+                <a href="{% url 'listar_clientes' %}" class="btn btn-outline-danger px-4 ml-2">Cancelar</a>
             </div>
         </form>
 

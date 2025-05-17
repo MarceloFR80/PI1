@@ -1,117 +1,148 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load status_filters %}
+{% load custom_filters %}
 
 {% block content %}
 <div class="container-fluid py-4">
-    <h2 class="mb-4 text-primary">
-        <i class="fas fa-truck-moving"></i> Controle de Coletas e Entregas
-    </h2>
 
-    <form method="get" class="row g-3 align-items-end mb-4 bg-light p-3 rounded shadow-sm">
-        <div class="col-md-3">
-            <label for="status_coleta" class="form-label">Status da Coleta</label>
-            <select name="status_coleta" id="status_coleta" class="form-select">
-                <option value="">Todos</option>
-                <option value="realizada">Realizada</option>
-                <option value="pendente">Pendente</option>
-                <option value="nao_realizada">Não Realizada</option>
-            </select>
-        </div>
-        <div class="col-md-3">
-            <label for="status_entrega" class="form-label">Status da Entrega</label>
-            <select name="status_entrega" id="status_entrega" class="form-select">
-                <option value="">Todos</option>
-                <option value="realizada">Realizada</option>
-                <option value="pendente">Pendente</option>
-                <option value="nao_realizada">Não Realizada</option>
-            </select>
-        </div>
-        <div class="col-md-4">
-            <label for="placa" class="form-label">Veículo (Placa ou Tipo)</label>
-            <select name="placa" id="placa" class="form-select">
-                <option value="">Todos</option>
-                {% for motorista in motoristas %}
-                    <option value="{{ motorista.placa }}">{{ motorista.placa }} - {{ motorista.tipo_de_veiculo }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-2 text-end">
-            <button type="submit" class="btn btn-primary w-100">
-                <i class="fas fa-search"></i> Filtrar
-            </button>
-        </div>
-    </form>
+    <!-- Título e Filtros na mesma linha -->
+    <div class="d-flex justify-content-between align-items-end flex-wrap mb-3">
+        <h2 class="text-primary mb-0 me-4">
+            <i class="fas fa-truck-moving"></i> Controle de Coletas e Entregas
+        </h2>
 
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card text-white bg-success shadow">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Coletas Realizadas</h5>
-                    <p class="card-text display-6">{{ coletas_realizadas }}</p>
-                </div>
+        <form method="get" class="d-flex flex-wrap align-items-end bg-light p-3 rounded shadow-sm gap-2">
+            <div class="me-2">
+                <label for="status_coleta" class="form-label mb-1">Status da Coleta</label>
+                <select name="status_coleta" id="status_coleta" class="form-select form-select-sm">
+                    <option value="">Todos</option>
+                    <option value="REALIZADA">Realizada</option>
+                    <option value="PENDENTE">Pendente</option>
+                    <option value="NAO_REALIZADA">Não Realizada</option>
+                </select>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-dark bg-warning shadow">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Coletas Pendentes</h5>
-                    <p class="card-text display-6">{{ coletas_pendentes }}</p>
-                </div>
+            <div class="me-2">
+                <label for="status_entrega" class="form-label mb-1">Status da Entrega</label>
+                <select name="status_entrega" id="status_entrega" class="form-select form-select-sm">
+                    <option value="">Todos</option>
+                    <option value="ENTREGUE">Entregue</option>
+                    <option value="PENDENTE">Pendente</option>
+                    <option value="NAO_ENTREGUE">Não Realizada</option>
+                </select>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-info shadow">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Entregas Realizadas</h5>
-                    <p class="card-text display-6">{{ entregas_realizadas }}</p>
-                </div>
+            <div class="me-2">
+                <label for="placa" class="form-label mb-1">Veículo (Placa ou Tipo)</label>
+                <select name="placa" id="placa" class="form-select form-select-sm">
+                    <option value="">Todos</option>
+                    {% for motorista in motoristas %}
+                        <option value="{{ motorista.placa }}">{{ motorista.placa }} - {{ motorista.tipo_de_veiculo }}</option>
+                    {% endfor %}
+                </select>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-danger shadow">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Entregas Pendentes</h5>
-                    <p class="card-text display-6">{{ entregas_pendentes }}</p>
-                </div>
+            <div>
+                <button type="submit" class="btn btn-primary btn-sm mt-2">
+                    <i class="fas fa-search"></i> Filtrar
+                </button>
             </div>
-        </div>
+        </form>
     </div>
 
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered align-middle">
-            <thead class="table-dark">
+
+    {% for roteiro in roteirizacoes %}
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="mb-0 d-flex align-items-center">
+                <i class="fas fa-user"></i>&nbsp;
+                {{ roteiro.motorista.nome_completo|default:roteiro.motorista.nome }}
+                <span class="badge bg-light text-dark ms-2">{{ roteiro.motorista.get_tipo_display }}</span>
+
+                {% if roteiro.motorista.celular or roteiro.motorista.telefone %}
+                <span class="ms-3">
+                    {% with telefone=roteiro.motorista.telefone|default:'' celular=roteiro.motorista.celular|default:'' %}
+                        <a href="tel:{{ telefone|cut:' '|cut:'('|cut:')'|cut:'-' }}" class="btn btn-sm btn-light me-1" title="Ligar para o motorista">
+                            <i class="fas fa-phone-alt text-success"></i>
+                        </a>
+                        <a href="https://wa.me/55{{ celular|cut:' '|cut:'('|cut:')'|cut:'-' }}" target="_blank" class="btn btn-sm btn-light" title="WhatsApp">
+                            <i class="fab fa-whatsapp text-success"></i>
+                        </a>
+                    {% endwith %}
+                </span>
+                {% endif %}
+            </h5>
+        </div>
+        <span>Roteirizado em {{ roteiro.data|date:"d/m/Y" }}</span>
+    </div>
+
+    <div class="card-body p-0">
+        <table class="table table-bordered table-hover mb-0">
+            <thead class="table-light">
                 <tr>
                     <th>Cliente</th>
                     <th>Origem</th>
                     <th>Destino</th>
                     <th>Status Coleta</th>
                     <th>Status Entrega</th>
-                    <th>Veículo</th>
+                    <th>Placa</th>
                     <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
-                {% for coleta in coletas %}
-                <tr>
-                    <td>{{ coleta.cliente }}</td>
-                    <td>{{ coleta.cidade_origem }} / {{ coleta.uf_origem }}</td>
-                    <td>{{ coleta.cidade_destino }} / {{ coleta.uf_destino }}</td>
-                    <td><span class="badge bg-{{ coleta.status_coleta|status_color }}">{{ coleta.get_status_coleta_display }}</span></td>
-                    <td><span class="badge bg-{{ coleta.status_entrega|status_color }}">{{ coleta.get_status_entrega_display }}</span></td>
-                    <td>{{ coleta.veiculo|default:'-' }}</td>
-                    <td>
-                        <a href="{% url 'editar_coleta' coleta.id %}" class="btn btn-warning btn-sm">Editar</a>
-                        <a href="{% url 'resumo_pdf_coleta' coleta.id %}" class="btn btn-info btn-sm">PDF</a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="7" class="text-center">Nenhuma coleta encontrada.</td>
-                </tr>
+                {% with pendente=False %}
+                {% for coleta in roteiro.coletas.all %}
+                    <tr>
+                        <td>{{ coleta.cliente }}</td>
+                        <td>{{ coleta.cidade_origem }} / {{ coleta.uf_origem }}</td>
+                        <td>{{ coleta.cidade_destino }} / {{ coleta.uf_destino }}</td>
+                        <td>
+                            <span class="badge bg-{{ coleta.status_coleta|status_color }}">{{ coleta.get_status_coleta_display }}</span>
+                            {% if coleta.status_coleta != "REALIZADA" %}
+                                {% with pendente=True %}{% endwith %}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ coleta.status_entrega|status_color }}">{{ coleta.get_status_entrega_display }}</span>
+                            {% if coleta.status_entrega != "ENTREGUE" %}
+                                {% with pendente=True %}{% endwith %}
+                            {% endif %}
+                        </td>
+                        <td>{{ roteiro.motorista.placa|default:"-" }}</td>
+                        <td>
+                            <a href="{% url 'editar_coleta' coleta.id %}" class="btn btn-warning btn-sm">Editar</a>
+                            <a href="{% url 'resumo_pdf_coleta' coleta.id %}" class="btn btn-info btn-sm">PDF</a>
+                        </td>
+                    </tr>
                 {% endfor %}
+                {% endwith %}
             </tbody>
         </table>
+
+        <!-- Botão de Finalizar Roteirização -->
+        {% with pendente=False %}
+        {% for coleta in roteiro.coletas.all %}
+            {% if coleta.status_coleta != "REALIZADA" or coleta.status_entrega != "ENTREGUE" %}
+                {% with pendente=True %}{% endwith %}
+            {% endif %}
+        {% endfor %}
+        {% if roteiro.tem_pendencias %}
+    <div class="text-end px-3 py-3">
+        <form method="post" action="{% url 'finalizar_roteirizacao' roteiro.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success btn-sm">
+                <i class="fas fa-check-circle"></i> Finalizar Coleta/Entrega
+            </button>
+        </form>
     </div>
+{% endif %}
+
+        {% endwith %}
+
+    </div>
+</div>
+{% empty %}
+    <p class="text-center">Nenhuma roteirização registrada.</p>
+{% endfor %}
+
 </div>
 {% endblock %}

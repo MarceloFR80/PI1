@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-center">Listagem dos Motoristas</h2>
+        <a href="{% url 'todosmotoristas_create' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-plus-circle"></i> Cadastrar Motorista
+        </a>
+    </div>
+
+    <table class="table table-bordered  text-center">
+        <thead class="table-dark align-middle">
+            <tr>
+                <th>
+                    <form method="get" id="filtroTipoForm" class="form-inline">
+                        <label for="tipo_motorista" class="form-label mr-2">Tipo:</label>
+                        <select name="tipo_motorista" id="tipo_motorista" class="form-select form-select-sm"
+                                onchange="document.getElementById('filtroTipoForm').submit();">
+                            <option value="" {% if request.GET.tipo_motorista == "" %}selected{% endif %}>Todos</option>
+                            <option value="PR" {% if request.GET.tipo_motorista == "PR" %}selected{% endif %}>Próprio</option>
+                            <option value="AG" {% if request.GET.tipo_motorista == "AG" %}selected{% endif %}>Agregado</option>
+                        </select>
+                    </form>
+                </th>
+                <th>Nome</th>
+                <th>CPF/CNPJ</th>
+                <th>Placa</th>
+                <th>Tipo Veículo</th>
+                <th>Cidade Base</th>
+                <th>Disponibilidade</th>                
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for motorista in motoristas %}
+                <tr>
+                    <td>{{ motorista.get_tipo_display }}</td>
+                    <td>{{ motorista.nome }}</td>
+                    <td>{{ motorista.cpf_cnpj }}</td>
+                    <td>{{ motorista.placa }}</td>
+                    <td>{{ motorista.tipo_de_veiculo }}</td>
+                    <td>{{ motorista.cidade_base }}</td>
+                    
+                    <td class="text-center">
+                        {% if motorista.disponibilidade == 'INDISPONIVEL' %}
+                            <span class="badge bg-danger">Indisponível</span>
+                        {% else %}
+                            <span class="badge bg-success">Disponível</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <a href="{% url 'todosmotoristas_update' motorista.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                        <a href="{% url 'todosmotoristas_delete' motorista.pk %}" class="btn btn-sm btn-danger">Excluir</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="8" class="text-center">Nenhum motorista encontrado.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

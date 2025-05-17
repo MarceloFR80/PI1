@@ -202,3 +202,64 @@ class Financeiro(models.Model):
     def lucro_prejuizo(self):
         # Calcula o lucro/prejuízo com base na receita e despesa totais
         return self.receitas - self.despesas
+#--------------------------------------------------------------------------------------------------------------------------
+class TodosMotoristas(models.Model):
+    TIPO_CHOICES = (
+        ('PR', 'Próprio'),
+        ('AG', 'Agregado'),
+    )
+
+    DISPONIBILIDADE_CHOICES = (
+        ('DISPONIVEL', 'Disponível'),
+        ('INDISPONIVEL', 'Indisponível'),
+    )
+
+    nome = models.CharField(max_length=255)
+    tipo = models.CharField(max_length=2, choices=TIPO_CHOICES, default='PR')
+    cpf_cnpj = models.CharField(max_length=18, unique=True)
+    celular = models.CharField(max_length=15, default='')
+    telefone = models.CharField(max_length=15)
+    tipo_de_veiculo = models.CharField(max_length=50, default='')
+    placa = models.CharField(max_length=8, default='')
+    email = models.EmailField()
+    disponibilidade = models.CharField(max_length=15, choices=DISPONIBILIDADE_CHOICES, default='DISPONIVEL')
+    ultima_roteirizacao = models.DateField(null=True, blank=True)
+    cidade_base = models.CharField(max_length=100, default='', blank=True)
+    data_cadastro = models.DateTimeField(auto_now_add=True)
+
+    # Campos extras para agregados
+    rg = models.CharField(max_length=20, blank=True, null=True)
+    orgao_emissor = models.CharField(max_length=20, blank=True, null=True)
+    data_emissao_rg = models.DateField(null=True, blank=True)
+    cnh = models.CharField(max_length=20, blank=True, null=True)
+    data_nascimento = models.DateField(null=True, blank=True)
+    celular2 = models.CharField(max_length=15, blank=True, null=True)
+    cep = models.CharField(max_length=9, blank=True, null=True)
+    rua = models.CharField(max_length=100, blank=True, null=True)
+    numero = models.CharField(max_length=10, blank=True, null=True)
+    bairro = models.CharField(max_length=100, blank=True, null=True)
+    cidade = models.CharField(max_length=100, blank=True, null=True)
+    estado = models.CharField(max_length=2, blank=True, null=True)
+    marca_modelo = models.CharField(max_length=100, blank=True, null=True)
+    ano_fabricacao = models.PositiveIntegerField(blank=True, null=True)
+    cor = models.CharField(max_length=30, blank=True, null=True)
+    capacidade_carga = models.CharField(max_length=50, blank=True, null=True)
+    banco = models.CharField(max_length=100, blank=True, null=True)
+    agencia = models.CharField(max_length=20, blank=True, null=True)
+    conta = models.CharField(max_length=20, blank=True, null=True)
+    tipo_conta = models.CharField(max_length=2, choices=[('PF', 'Pessoa Física'), ('PJ', 'Pessoa Jurídica')], blank=True, null=True)
+    pix = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.nome} ({self.placa})"
+#------------------------------------------------------ROTEIRIZAÇÃO-----------------------------------------------------------------------
+class Roteirizacao(models.Model):
+    motorista = models.ForeignKey(TodosMotoristas, on_delete=models.CASCADE)
+    data = models.DateField(auto_now_add=True)
+    coletas = models.ManyToManyField(Cotacao)
+    observacao = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.motorista.nome_completo} - {self.data}"
+#----------------------------------------------------------------------------------------------------------------------------------------
+    

@@ -79,11 +79,12 @@
                         Motoristas
                     </a>
                     <div class="dropdown-menu" aria-labelledby="motoristasDropdown">
-                        <a class="dropdown-item" href="{% url 'motorista_create' %}">Cadastrar Motorista</a>
-                        <a class="dropdown-item" href="{% url 'motorista_agregado_create' %}">Cadastrar Agregado</a>
-                        <a class="dropdown-item" href="{% url 'motorista_list' %}">Listar Motoristas</a>
+                        <a class="dropdown-item" href="{% url 'todosmotoristas_create' %}">Cadastrar Motorista</a>
+                        <a class="dropdown-item" href="{% url 'todosmotoristas_list' %}">Listar Motoristas</a>
                     </div>
                 </li>
+
+
     
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="coletasDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -159,37 +160,34 @@
     
    <!--                                                    -API VIACEP-                                                    -->
     <script>
-        function buscarEndereco() {
-            const cep = document.getElementById("id_cep").value.replace(/\D/g, '');
-            if (cep.length !== 8) return;
-    
-            fetch(`https://viacep.com.br/ws/${cep}/json/`)
-                .then(response => response.json())
-                .then(data => {
-                    if (!data.erro) {
-                        document.getElementById("id_rua").value = data.logradouro || '';
-                        document.getElementById("id_bairro").value = data.bairro || '';
-                        document.getElementById("id_cidade").value = data.localidade || '';
-                        document.getElementById("id_uf").value = data.uf || '';
-                        
-                        // FOCO NO CAMPO "Número"
-                        document.getElementById("id_numero").focus();
-                    } else {
-                        alert("CEP não encontrado.");
-                    }
-                })
-                .catch(() => {
-                    alert("Erro ao buscar o CEP. Tente novamente.");
-                });
-        }
-    
         document.addEventListener("DOMContentLoaded", function () {
-            const campoCep = document.getElementById("id_cep");
-            if (campoCep) {
-                campoCep.addEventListener("change", buscarEndereco);
+            const cepInput = document.getElementById("id_cep");
+
+            if (cepInput) {
+                cepInput.addEventListener("blur", function () {
+                    const cep = cepInput.value.replace(/\D/g, '');
+
+                    if (cep.length === 8) {
+                        fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (!data.erro) {
+                                    document.getElementById("id_rua").value = data.logradouro || '';
+                                    document.getElementById("id_bairro").value = data.bairro || '';
+                                    document.getElementById("id_cidade").value = data.localidade || '';
+                                    document.getElementById("id_estado").value = data.uf || '';
+                                    document.getElementById("id_numero").focus();
+                                } else {
+                                    alert("CEP não encontrado.");
+                                }
+                            })
+                            .catch(() => alert("Erro ao buscar o CEP. Verifique sua conexão."));
+                    }
+                });
             }
         });
     </script>
+
     
     <script>
         document.addEventListener("DOMContentLoaded", function () {
