@@ -102,8 +102,8 @@
                         </div>
                         <div class="row">
                             <div class="form-group col-md-5">{{ form.cidade.label_tag }} {{ form.cidade|add_class:"form-control" }}</div>
-                            <div class="form-group col-md-4">{{ form.bairro.label_tag }} {{ form.bairro|add_class:"form-control" }}</div>
-                            <div class="form-group col-md-3">{{ form.estado.label_tag }} {{ form.estado|add_class:"form-control" }}</div>
+                            <div class="form-group col-md-3">{{ form.bairro.label_tag }} {{ form.bairro|add_class:"form-control" }}</div>
+                            <div class="form-group col-md-3">{{ form.estado.label_tag }} {{ form.estado|add_class:"form-control"|attr:"id:id_estado" }}</div>
                         </div>
                     </div>
 
@@ -253,6 +253,42 @@ document.addEventListener("DOMContentLoaded", function () {
     mostrarAba(indiceAtual);  // inicializa na primeira aba
 });
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const cep = document.getElementById("id_cep");
+    const rua = document.getElementById("id_rua");
+    const bairro = document.getElementById("id_bairro");
+    const cidade = document.getElementById("id_cidade");
+    const estado = document.getElementById("id_estado");
 
+    const numero = document.getElementById("id_numero");
+
+    cep.addEventListener("blur", function () {
+        const cepVal = cep.value.replace(/\D/g, '');
+        if (cepVal.length !== 8) {
+            return;
+        }
+
+        fetch(`https://viacep.com.br/ws/${cepVal}/json/`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.erro) {
+                    rua.value = data.logradouro || '';
+                    bairro.value = data.bairro || '';
+                    cidade.value = data.localidade || '';
+                    estado.value = data.uf || '';
+
+                    // ✅ Focar no campo número após preenchimento do CEP
+                    setTimeout(() => {
+                        numero.focus();
+                    }, 100);
+                }
+            })
+            .catch(error => {
+                console.error("Erro ao buscar o CEP:", error);
+            });
+    });
+});
+</script>
 
 {% endblock %}

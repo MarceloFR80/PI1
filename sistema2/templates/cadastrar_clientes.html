@@ -92,7 +92,7 @@
                             </div>
                             <div class="form-group col-md-4">
                                 {{ form.numero.label_tag }}
-                                {{ form.numero|add_class:"form-control" }}
+                                {{ form.numero|add_class:"form-control"|attr:"id:id_numero" }}
                             </div>
                         </div>
                         <div class="form-row">
@@ -105,10 +105,10 @@
                                 {{ form.cidade|add_class:"form-control"|attr:"id:id_cidade" }}
                             </div>
                             <div class="form-group col-md-4">
-                                {{ form.estado.label_tag }}
-                                {{ form.estado|add_class:"form-control"|attr:"id:id_estado" }}
-                                
+                                {{ form.uf.label_tag }}
+                                {{ form.uf|add_class:"form-control"|attr:"id:id_estado" }}
                             </div>
+
                         </div>   
                     </div>
 
@@ -126,10 +126,47 @@
         </div>
     </div>
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const cep = document.getElementById("id_cep");
+    const rua = document.getElementById("id_rua");
+    const bairro = document.getElementById("id_bairro");
+    const cidade = document.getElementById("id_cidade");
+    const estado = document.getElementById("id_estado");
+    const numero = document.getElementById("id_numero");
+
+    cep.addEventListener("blur", function () {
+        const cepVal = cep.value.replace(/\D/g, '');
+        if (cepVal.length !== 8) {
+            return;
+        }
+
+        fetch(`https://viacep.com.br/ws/${cepVal}/json/`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.erro) {
+                    rua.value = data.logradouro || '';
+                    bairro.value = data.bairro || '';
+                    cidade.value = data.localidade || '';
+                    estado.value = data.uf || '';
+
+                    // ✅ Focar no campo número após preenchimento do CEP
+                    setTimeout(() => {
+                        numero.focus();
+                    }, 100);
+                }
+            })
+            .catch(error => {
+                console.error("Erro ao buscar o CEP:", error);
+            });
+    });
+});
+</script>
 
 <script>
     function irParaAba(abaId) {
         $('#clienteTabs a[href="#' + abaId + '"]').tab('show');
     }
 </script>
+
 {% endblock %}

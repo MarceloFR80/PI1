@@ -160,33 +160,41 @@
     
    <!--                                                    -API VIACEP-                                                    -->
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const cepInput = document.getElementById("id_cep");
+document.addEventListener("DOMContentLoaded", function () {
+    const cep = document.getElementById("id_cep");
+    const rua = document.getElementById("id_rua");
+    const bairro = document.getElementById("id_bairro");
+    const cidade = document.getElementById("id_cidade");
+    const estado = document.getElementById("id_estado");
+    const numero = document.getElementById("id_numero");
 
-            if (cepInput) {
-                cepInput.addEventListener("blur", function () {
-                    const cep = cepInput.value.replace(/\D/g, '');
+    cep.addEventListener("blur", function () {
+        const cepVal = cep.value.replace(/\D/g, '');
+        if (cepVal.length !== 8) {
+            return;
+        }
 
-                    if (cep.length === 8) {
-                        fetch(`https://viacep.com.br/ws/${cep}/json/`)
-                            .then(response => response.json())
-                            .then(data => {
-                                if (!data.erro) {
-                                    document.getElementById("id_rua").value = data.logradouro || '';
-                                    document.getElementById("id_bairro").value = data.bairro || '';
-                                    document.getElementById("id_cidade").value = data.localidade || '';
-                                    document.getElementById("id_estado").value = data.uf || '';
-                                    document.getElementById("id_numero").focus();
-                                } else {
-                                    alert("CEP não encontrado.");
-                                }
-                            })
-                            .catch(() => alert("Erro ao buscar o CEP. Verifique sua conexão."));
-                    }
-                });
-            }
-        });
-    </script>
+        fetch(`https://viacep.com.br/ws/${cepVal}/json/`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.erro) {
+                    rua.value = data.logradouro || '';
+                    bairro.value = data.bairro || '';
+                    cidade.value = data.localidade || '';
+                    estado.value = data.uf || '';
+
+                    // ✅ Focar no campo número após preenchimento do CEP
+                    setTimeout(() => {
+                        numero.focus();
+                    }, 100);
+                }
+            })
+            .catch(error => {
+                console.error("Erro ao buscar o CEP:", error);
+            });
+    });
+});
+</script>
 
     
     <script>

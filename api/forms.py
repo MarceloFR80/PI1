@@ -20,8 +20,9 @@ class ClienteForm(forms.ModelForm):
             'rua': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_rua'}),
             'bairro': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_bairro'}),
             'cidade': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_cidade'}),
-            'uf': forms.Select(attrs={'class': 'form-control', 'id': 'id_uf'}),
-            'numero': forms.TextInput(attrs={'class': 'form-control'}),
+            'uf': forms.Select(attrs={'class': 'form-control', 'id': 'id_estado'}),
+            'numero': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_numero'}),
+
         }
 
         labels = {
@@ -73,6 +74,11 @@ class ColetaForm(forms.ModelForm):
             'data_coleta': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'tipo_frete': forms.Select(attrs={'class': 'form-control'}),
             'descricao_produto': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+        }
+        labels = {
+            'peso': 'Peso (Kg)',
+            'dimensoes': 'Dimensões (m³)',
+            'valor_carga': 'Valor da Carga (R$)',
         }
 
     def __init__(self, *args, **kwargs):
